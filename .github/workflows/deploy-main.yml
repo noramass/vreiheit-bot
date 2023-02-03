@@ -19,13 +19,14 @@ jobs:
           username: ${{ secrets.GH_USERNAME }}
           password: ${{ secrets.GH_TOKEN }}
       - run: |
-          docker build . -t ghcr.io/eyyy-nora/vreiheit-bot:${{ github.sha }} --build-arg=DISCORD_TOKEN="${{ secrets.DISCORD_TOKEN }}" --build-arg=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID }}" --build-arg=DISCORD_CLIENT_SECRET="${{ secrets.DISCORD_CLIENT_SECRET }}"
-          docker push ghcr.io/eyyy-nora/vreiheit-bot:${{ github.sha }}
+          docker build . -t ghcr.io/${{ secrets.GH_USERNAME }}/vreiheit-bot:${{ github.sha }} -t ghcr.io/${{ secrets.GH_USERNAME }}/vreiheit-bot:latest --build-arg=DISCORD_TOKEN="${{ secrets.DISCORD_TOKEN }}" --build-arg=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID }}" --build-arg=DISCORD_CLIENT_SECRET="${{ secrets.DISCORD_CLIENT_SECRET }}"
+          docker push ghcr.io/${{ secrets.GH_USERNAME }}/vreiheit-bot:${{ github.sha }}
+          docker push ghcr.io/${{ secrets.GH_USERNAME }}/vreiheit-bot:latest
       - uses: azure/setup-kubectl@v3
       - uses: azure/k8s-set-context@v1
         with:
           method: kubeconfig
-          kubeconfig: ${{ secrets.K8_CONFIG }} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
+          kubeconfig: ${{ secrets.K8_CONFIG }}
       - uses: azure/k8s-create-secret@v1.1
         with:
           container-regustry-url: ghcr.io
@@ -36,10 +37,10 @@ jobs:
       - uses: azure/k8s-deploy@v4
         with:
           action: deploy
+          strategy: basic
           manifests: |
             manifests/deployment.yml
-            manifests/service.yml
           images: |
-            ghcr.io/eyyy-nora/vreiheit-discord-bot:${{ github.sha }}
+            ghcr.io/${{ secrets.GH_USERNAME }}/vreiheit-discord-bot:${{ github.sha }}
           imagepullsecrets: |
             gh-registry-secret
