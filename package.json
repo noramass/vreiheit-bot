@@ -7,8 +7,8 @@
     "dev": "tsup --watch",
     "build": "tsup",
     "start": "node dist/main.js",
-    "lint": "eslint",
-    "lint:fix": "eslint --fix"
+    "lint": "eslint --ext .ts,.tsx",
+    "lint:fix": "eslint --fix --ext .ts,.tsx"
   },
   "keywords": [],
   "author": "Nora Reichwald <nora@reichwald.me> (https://reichwald.me/)",
@@ -30,6 +30,7 @@
   },
   "dependencies": {
     "discord.js": "^14.7.1",
+    "discord.tsx": "^3.0.0",
     "dotenv": "^16.0.3"
   }
 }

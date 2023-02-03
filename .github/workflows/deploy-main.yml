@@ -1,0 +1,47 @@
+name: deploy-main
+on:
+  push:
+    branches:
+      - main
+concurrency: production
+permissions:
+  id-token: write
+  contents: read
+  actions: read
+jobs:
+  deployment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: VaultVulp/gp-docker-action@1.5.2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }} # Provide GITHUB_TOKEN to login into the GitHub Packages
+          image-name: ghcr.io/eyyy-nora/vreiheit-discord-bot # Provide only Docker image name, tag will be automatically set to latest
+          image-tag: ${{ github.sha }}
+          additional-image-tags: latest
+          custom-args: |
+            --build-arg=DISCORD_TOKEN="${{ secrets.DISCORD_TOKEN }}"
+            --build-arg=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID }}"
+            --build-arg=DISCORD_CLIENT_SECRET="${{ secrets.DISCORD_CLIENT_SECRET }}"
+      - uses: azure/setup-kubectl@v3
+      - uses: azure/k8s-set-context@v1
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.K8_CONFIG }} # Use secret (https://developer.github.com/actions/managing-workflows/storing-secrets/)
+      - uses: azure/k8s-create-secret@v1.1
+        with:
+          container-regustry-url: ghcr.io
+          container-registry-username: ${{ secrets.GH_USERNAME }}
+          container-registry-password: ${{ secrets.GH_TOKEN }}
+          container-registry-email: ${{ secrets.GH_EMAIL }}
+          secret-name: gh-registry-secret
+      - uses: azure/k8s-deploy@v4
+        with:
+          action: deploy
+          manifests: |
+            manifests/deployment.yml
+            manifests/service.yml
+          images: |
+            ghcr.io/eyyy-nora/vreiheit-discord-bot:${{ github.sha }}
+          imagepullsecrets: |
+            gh-registry-secret
