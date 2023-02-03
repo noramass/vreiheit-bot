@@ -10,6 +10,7 @@ import {
   createPrimaryPronounButtons,
   processPronounInteraction,
 } from "src/roles/pronouns/buttons";
+import { cyclicIterator } from "src/util";
 export async function initialise() {
   const client = await withClient();
   const invite = generateInvite();
@@ -63,4 +64,13 @@ client.on("guildMemberRemove", async member => {
   await removeCustomPronounRole(member as any);
 });
 
-if (!module.parent) initialise().then();
+if (!module.parent)
+  (async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    for (const ignored of cyclicIterator([""]))
+      try {
+        await initialise();
+      } finally {
+        console.log("restarting");
+      }
+  })().then();
