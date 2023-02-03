@@ -14,7 +14,10 @@
     "baseUrl": ".",
     "paths": {
       "src/*": ["src/*"]
-    }
+    },
+    "jsx": "react",
+    "jsxFactory": "DiscordComponents.createFragment",
+    "jsxFragmentFactory": "DiscordComponents.Fragment"
   },
   "ts-node": {
     "esm": true,

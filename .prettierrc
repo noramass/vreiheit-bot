@@ -5,7 +5,7 @@
   "proseWrap": "always",
   "vueIndentScriptAndStyle": false,
   "singleQuote": false,
-  "printWidth": 100,
+  "printWidth": 80,
   "plugins": [],
   "semi": true,
   "tabWidth": 2,
