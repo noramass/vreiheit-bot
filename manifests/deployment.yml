@@ -5,7 +5,7 @@ metadata:
   labels:
     app: vreiheit-discord-bot
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: vreiheit-discord-bot
@@ -17,3 +17,5 @@ spec:
       containers:
         - name: vreiheit-discord-bot
           image: ghcr.io/eyyy-nora/vreiheit-discord-bot:latest
+      imagePullSecrets:
+        - name: gh-registry-secret
