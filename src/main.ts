@@ -1,8 +1,15 @@
 import { ActivityType } from "discord.js";
 import { client, generateInvite, withClient } from "src/init/discord";
 import { cyclePresence } from "src/presence/cycle-presence";
-import { cleanupPronounRoles, getAllPronounRoles, removeCustomPronounRole } from "src/roles/pronouns";
-import { createPrimaryPronounButtons, processPronounInteraction } from "src/roles/pronouns/buttons";
+import {
+  cleanupPronounRoles,
+  getAllPronounRoles,
+  removeCustomPronounRole,
+} from "src/roles/pronouns";
+import {
+  createPrimaryPronounButtons,
+  processPronounInteraction,
+} from "src/roles/pronouns/buttons";
 export async function initialise() {
   const client = await withClient();
   const invite = generateInvite();
@@ -50,10 +57,6 @@ client.on("messageCreate", async message => {
       console.log(e);
     }
   }
-});
-
-client.on("guildMemberRemove", async member => {
-  await removeCustomPronounRole(member as any);
 });
 
 if (!module.parent) initialise().then();
