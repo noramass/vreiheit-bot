@@ -29,7 +29,7 @@ jobs:
           kubeconfig: ${{ secrets.K8_CONFIG }}
       - uses: azure/k8s-create-secret@v1.1
         with:
-          container-regustry-url: ghcr.io
+          container-registry-url: ghcr.io
           container-registry-username: ${{ secrets.GH_USERNAME }}
           container-registry-password: ${{ secrets.GH_TOKEN }}
           container-registry-email: ${{ secrets.GH_EMAIL }}
