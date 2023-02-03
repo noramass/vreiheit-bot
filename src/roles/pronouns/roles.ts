@@ -47,10 +47,17 @@ const pronounRoleShared: CreateRoleOptions = {
 export async function getAllPronounRoles(guild: Guild) {
   await ensureRolesExist(
     guild,
-    Object.values(pronounRoles).map(role => ({ ...pronounRoleShared, ...role })),
+    Object.values(pronounRoles).map(role => ({
+      ...pronounRoleShared,
+      ...role,
+    })),
   );
-  const matching = await getRolesMatching(guild, role => role.name.startsWith(prefix("")));
-  const results: Record<keyof typeof pronounRoles, Role> & { other: Role[] } = { other: [] } as any;
+  const matching = await getRolesMatching(guild, role =>
+    role.name.startsWith(prefix("")),
+  );
+  const results: Record<keyof typeof pronounRoles, Role> & { other: Role[] } = {
+    other: [],
+  } as any;
   const names = createInverseLookup(pronounRoles, ({ name }) => name);
   for (const role of matching.values()) {
     const key = names[role.name];
@@ -67,16 +74,21 @@ export async function getAllPronounRolesArray(guild: Guild) {
 }
 
 export async function cleanupPronounRoles(guild: Guild) {
-  await guild.members.fetch();
+  /*await guild.members.fetch();
   console.log("cleanup pronouns:", guild.name);
   const roles = await getAllPronounRoles(guild);
   for (const role of roles.other) {
-    console.log("members", ...role.members.values());
+    console.log("members", role.members.size, ...role.members.values());
     // if (!role.members.size) await role.delete("Unused");
-  }
+  }*/
 }
 
-export async function createCustomPronounRole(guild: Guild, member: GuildMember, pronouns: string, color: string) {
+export async function createCustomPronounRole(
+  guild: Guild,
+  member: GuildMember,
+  pronouns: string,
+  color: string,
+) {
   const role = await guild.roles.create({
     ...pronounRoleShared,
     name: prefix(pronouns),
@@ -88,7 +100,8 @@ export async function createCustomPronounRole(guild: Guild, member: GuildMember,
 export async function togglePronounRole(member: GuildMember, roleId: string) {
   const { other, ...primary } = await getAllPronounRoles(member.guild);
   const pronounRoles = Object.values(primary).concat(...other);
-  if (!/^[0-9]+$/.test(roleId)) roleId = pronounRoles.find(it => it.name === roleId).id;
+  if (!/^[0-9]+$/.test(roleId))
+    roleId = pronounRoles.find(it => it.name === roleId).id;
   await member.fetch();
   const roles = member.roles.cache;
   for (const role of pronounRoles) {
@@ -96,7 +109,8 @@ export async function togglePronounRole(member: GuildMember, roleId: string) {
     const matches = role.id === roleId;
     if ((hasRole && matches) || !matches) {
       await member.roles.remove(role);
-      if (other.find(it => it.id === role.id)) await member.guild.roles.delete(role);
+      if (other.find(it => it.id === role.id) && hasRole)
+        await member.guild.roles.delete(role);
     } else if (matches) await member.roles.add(role);
   }
 }

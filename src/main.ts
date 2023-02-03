@@ -49,7 +49,7 @@ client.on("messageCreate", async message => {
     const buttons = await createPrimaryPronounButtons(message.guild as any);
     try {
       await message.channel.send({
-        content: "Choose Your Pronouns :)",
+        content: "Wähle deine Pronomen",
         embeds: [],
         components: buttons as any,
       });
@@ -57,6 +57,10 @@ client.on("messageCreate", async message => {
       console.log(e);
     }
   }
+});
+
+client.on("guildMemberRemove", async member => {
+  await removeCustomPronounRole(member as any);
 });
 
 if (!module.parent) initialise().then();

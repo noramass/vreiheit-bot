@@ -12,7 +12,7 @@ export const client = new Client({
   intents: [
     "Guilds",
     "GuildIntegrations",
-    // "GuildMembers",
+    "GuildMembers",
     "GuildMessages",
     // "GuildMessageReactions",
     // "GuildModeration",
