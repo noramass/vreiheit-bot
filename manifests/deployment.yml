@@ -16,4 +16,4 @@ spec:
     spec:
       containers:
         - name: vreiheit-discord-bot
-          image: ghcr.io/eyyy-nora/vreiheit-discord-bot:latest
+          image: ghcr.io/eyyy-nora/vreiheit-bot:latest
