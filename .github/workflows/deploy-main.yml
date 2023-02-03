@@ -16,8 +16,8 @@ jobs:
       - uses: azure/docker-login@v1
         with:
           login-server: ghcr.io
-          username: ${{ secrets.GITHUB_USERNAME }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: ${{ secrets.GH_USERNAME }}
+          password: ${{ secrets.GH_TOKEN }}
       - run: |
           docker build . -t ghcr.io/eyyy-nora/vreiheit-bot:${{ github.sha }} --build-arg=DISCORD_TOKEN="${{ secrets.DISCORD_TOKEN }}" --build-arg=DISCORD_CLIENT_ID="${{ secrets.DISCORD_CLIENT_ID }}" --build-arg=DISCORD_CLIENT_SECRET="${{ secrets.DISCORD_CLIENT_SECRET }}"
           docker push ghcr.io/eyyy-nora/vreiheit-bot:${{ github.sha }}
