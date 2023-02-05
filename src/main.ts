@@ -8,6 +8,7 @@ import { getHierarchy, getHierarchyRole } from "src/roles/hierachy/hierachy";
 import { roleByName } from "src/roles/role-by-name";
 import { cyclicIterator } from "src/util";
 import "./commands";
+import { ServerMember } from "./entities/server-member";
 import "./services";
 export async function initialise() {
   await dataSource.initialize();
@@ -73,6 +74,10 @@ client.on("guildMemberRemove", async member => {
     await handler(member as any);
 
   // await removeCustomPronounRole(member as any);
+  if(member.user.bot) return;
+  const userEntry = await dataSource.getRepository(ServerMember).findOne({ where: { discordId: member.user.id } });
+  userEntry.leftAt = new Date();
+  await dataSource.getRepository(ServerMember).save(userEntry);
 });
 
 client.on("guildMemberAdd", async member => {
@@ -89,6 +94,20 @@ client.on("guildMemberAdd", async member => {
     if (!role) await member.roles.add(hierarchy[0]);
     console.log(member.user.username, "ist dem server beigetreten");
     // TODO: welcome messages
+    const guild  = await dataSource
+        .getRepository(Server)
+        .findOne({ where: { discordId: member.guild.id } });
+
+    const existingUser = await dataSource.getRepository(ServerMember).findOne({ where: { discordId: member.user.id } });
+    if (existingUser){
+      existingUser.leftAt = null;
+      await dataSource.getRepository(ServerMember).save(existingUser);
+      return;
+    }
+    const userEntry : Partial<ServerMember> = { discordId: member.user.id, username: member.user.username, discriminator: member.user.discriminator, avatarUrl: member.user.avatarURL(), guild };
+    userEntry.discordId = member.user.id;
+    await dataSource.getRepository(ServerMember).save(userEntry);
+
   }
 });
 
