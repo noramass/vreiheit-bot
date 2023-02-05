@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vreiheit-postgres-deployment
+  labels:
+    app: vreiheit
+    ver: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vreiheit
+      ver: postgres-deployment
+  template:
+    metadata:
+      labels:
+        app: vreiheit
+        ver: postgres-deployment
+    spec:
+      containers:
+        - name: vreiheit-postgres
+          image: postgres:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5324
+          env:
+            - name: POSTGRES_USER
+              valueForm:
+                secretKeyRef:
+                  name: vreiheit-postgres
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: vreiheit-postgres
+                  key: password
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: vreiheit-postgres
+                  key: db
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: pgdatavol
+    volumes:
+      - name: pgdatavol
+        persistentVolumeClaim:
+          claimName: vreiheit-postgres-pvc
