@@ -1,6 +1,5 @@
 import { Interaction } from "discord.js";
 import {
-  Constructor,
   DiscordHandlerMeta,
   getMeta,
   InitHandler,
@@ -51,6 +50,11 @@ function createHandlers(instance: any, meta: DiscordHandlerMeta) {
   };
 
   const prefix = meta.prefix;
+  function pre(str: string) {
+    if (str.startsWith("-")) return str.slice(1);
+    if (!prefix) return str;
+    return `${prefix}:${str}`;
+  }
 
   for (const [key, value] of Object.entries(meta)) {
     switch (key as keyof DiscordHandlerMeta) {
@@ -76,12 +80,12 @@ function createHandlers(instance: any, meta: DiscordHandlerMeta) {
         break;
       case "button":
         for (const [key, handlers] of Object.entries(value)) {
-          const fullPrefix = prefix ? `${prefix}:${key}` : key;
+          const fullPrefix = pre(key);
           (handlerMap.interaction[fullPrefix] ??= []).push(
             ...(handlers as any).map(handler => {
-              return (interaction: Interaction, id: string) => {
+              return (interaction: Interaction, ...params: string[]) => {
                 if (!interaction.isButton()) return;
-                return handler.call(instance, interaction, id);
+                return handler.call(instance, interaction, ...params);
               };
             }),
           );
@@ -91,10 +95,10 @@ function createHandlers(instance: any, meta: DiscordHandlerMeta) {
         for (const [key, handlers] of Object.entries(value)) {
           (handlerMap.interaction[""] ??= []).push(
             ...(handlers as any).map(handler => {
-              return (interaction: Interaction, id: string) => {
+              return (interaction: Interaction, ...params: string[]) => {
                 if (!interaction.isCommand()) return;
                 if (interaction.commandName !== key) return;
-                return handler.call(instance, interaction, id);
+                return handler.call(instance, interaction, ...params);
               };
             }),
           );
@@ -102,12 +106,12 @@ function createHandlers(instance: any, meta: DiscordHandlerMeta) {
         break;
       case "form":
         for (const [key, handlers] of Object.entries(value)) {
-          const fullPrefix = prefix ? `${prefix}:${key}` : key;
+          const fullPrefix = pre(key);
           (handlerMap.interaction[fullPrefix] ??= []).push(
             ...(handlers as any).map(handler => {
-              return (interaction: Interaction, id: string) => {
+              return (interaction: Interaction, ...params: string[]) => {
                 if (!interaction.isModalSubmit()) return;
-                return handler.call(instance, interaction, id);
+                return handler.call(instance, interaction, ...params);
               };
             }),
           );
@@ -115,11 +119,11 @@ function createHandlers(instance: any, meta: DiscordHandlerMeta) {
         break;
       case "interaction":
         for (const [key, handlers] of Object.entries(value)) {
-          const fullPrefix = prefix ? `${prefix}:${key}` : key;
+          const fullPrefix = pre(key);
           (handlerMap.interaction[fullPrefix] ??= []).push(
             ...(handlers as any).map(handler => {
-              return (interaction: Interaction, id: string) => {
-                return handler.call(instance, interaction, id);
+              return (interaction: Interaction, ...params: string[]) => {
+                return handler.call(instance, interaction, ...params);
               };
             }),
           );

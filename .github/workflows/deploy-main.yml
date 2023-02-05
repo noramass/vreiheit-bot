@@ -27,13 +27,26 @@ jobs:
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.K8_CONFIG }}
-      - uses: azure/k8s-create-secret@v1.1
+      - uses: azure/k8s-create-secret@v4
         with:
           container-registry-url: ghcr.io
           container-registry-username: ${{ secrets.GH_USERNAME }}
           container-registry-password: ${{ secrets.GH_TOKEN }}
           container-registry-email: ${{ secrets.GH_EMAIL }}
           secret-name: gh-registry-secret
+          namespace: default
+      - uses: azure/k8s-create-secret@v4
+        with:
+          namespace: default
+          secret-type: generic
+          secret-name: vreiheit-postgres-user
+          data: ${{ secrets.POSTGRES_USER }}
+      - uses: azure/k8s-create-secret@v4
+        with:
+          namespace: default
+          secret-type: generic
+          secret-name: vreiheit-postgres-password
+          data: ${{ secrets.POSTGRES_PASSWORD }}
       - uses: azure/k8s-deploy@v4
         with:
           action: deploy
