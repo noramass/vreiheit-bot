@@ -31,6 +31,7 @@
   "dependencies": {
     "discord.js": "^14.7.1",
     "discord.tsx": "^3.0.0",
-    "dotenv": "^16.0.3"
+    "dotenv": "^16.0.3",
+    "typeorm": "^0.3.11"
   }
 }
