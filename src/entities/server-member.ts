@@ -36,6 +36,10 @@ export class ServerMember {
   @UpdateDateColumn()
   updatedAt!: Date;
 
+  @Column("timestamp", { nullable: true })
+  leftAt?: Date;
+
+
   @OneToMany(() => BlockedTerm, ({ author }) => author)
   blockedTerms!: BlockedTerm[];
 
