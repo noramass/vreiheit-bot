@@ -8,6 +8,8 @@ import { getHierarchy, getHierarchyRole } from "src/roles/hierachy/hierachy";
 import { roleByName } from "src/roles/role-by-name";
 import { cyclicIterator } from "src/util";
 import "./commands";
+import { modLog } from "./logging/mod-log";
+import { findChannel } from "./messages";
 import "./services";
 export async function initialise() {
   await dataSource.initialize();
@@ -65,6 +67,26 @@ client.on("interactionCreate", async interaction => {
 client.on("messageCreate", async message => {
   for (const handler of registeredHandlers.message) {
     await handler(message);
+  };
+
+  if (!message.author.bot)
+  {
+    let channel = await findChannel(message.guild, message.channelId);
+    await modLog(message.guild, `In **${channel.name}** schrieb **${message.author.username}#${message.author.discriminator}**: "${message.content}"`);
+  };
+});
+
+client.on("messageUpdate", async (oldMessage, newMessage) => {
+  if (!newMessage.author.bot) {
+    let channel = await findChannel(newMessage.guild, newMessage.channelId);
+    await modLog(newMessage.guild, `In **${channel.name}** überarbeitete **${newMessage.author.username}#${newMessage.author.discriminator}**: "${oldMessage.content}" zu "${newMessage.content}"`);
+  }
+});
+
+client.on("messageDelete", async message => {
+  if (!message.author.bot) {
+    let channel = await findChannel(message.guild, message.channelId);
+    await modLog(message.guild, `In **${channel.name}** löscht **${message.author.username}#${message.author.discriminator}**: "${message.content}"`);
   }
 });
 
