@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vreiheit-pg-deployment
+  labels:
+    app: vreiheit-postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vreiheit-postgres
+  template:
+    metadata:
+      labels:
+        app: vreiheit-postgres
+    spec:
+      containers:
+        - name: vreiheit-pg
+          image: postgres:15
+          resources:
+          requests:
+            cpu: 600m
+            memory: 512Mi
+          limits:
+            cpu: 1500m
+            memory: 8Gi
+          ports:
+            - containerPort: 5324
+          envFrom:
+            - configMapRef:
+                name: postgres-secret
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgredb
+    volumes:
+      - name: postgredb
+        persistentVolumeClaim:
+          claimName: postgres-pv-claim
