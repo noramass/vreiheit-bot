@@ -9,5 +9,4 @@ metadata:
     capacity:
       storage: 10Gi
     accessModes:
-      - ReadWriteMany
     persistentVolumeReclaimPolicy: Retain
