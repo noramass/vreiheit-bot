@@ -30,13 +30,16 @@ export class ServerMember {
   pronouns?: string;
 
   @Column("varchar", { nullable: true })
-  avatarUrl?: string;
+  avatarUrl?: string | null;
 
   @CreateDateColumn()
   createdAt!: Date;
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @Column("timestamp", { nullable: true })
+  leftAt?: Date | null;
 
   @OneToMany(() => BlockedTerm, ({ author }) => author)
   blockedTerms!: BlockedTerm[];
