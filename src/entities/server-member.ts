@@ -7,15 +7,17 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from "typeorm";
 
 @Entity("member")
+@Unique("discordId_server", ["discordId", "guild"])
 export class ServerMember {
   @PrimaryGeneratedColumn("uuid")
   uuid!: string;
 
-  @Column("varchar", { unique: true })
+  @Column("varchar")
   discordId!: string;
 
   @Column("varchar")
@@ -28,13 +30,16 @@ export class ServerMember {
   pronouns?: string;
 
   @Column("varchar", { nullable: true })
-  avatarUrl?: string;
+  avatarUrl?: string | null;
 
   @CreateDateColumn()
   createdAt!: Date;
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @Column("timestamp", { nullable: true })
+  leftAt?: Date | null;
 
   @OneToMany(() => BlockedTerm, ({ author }) => author)
   blockedTerms!: BlockedTerm[];
