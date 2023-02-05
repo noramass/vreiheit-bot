@@ -28,11 +28,11 @@ spec:
             - containerPort: 5324
           envFrom:
             - configMapRef:
-                name: postgres-secret
+                name: vreiheit-postgres-config
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
-              name: postgredb
+              name: pgdatavol
     volumes:
-      - name: postgredb
+      - name: pgdatavol
         persistentVolumeClaim:
-          claimName: postgres-pv-claim
+          claimName: vreiheit-postgres-pvc
