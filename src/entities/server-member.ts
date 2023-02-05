@@ -28,7 +28,7 @@ export class ServerMember {
   pronouns?: string;
 
   @Column("varchar", { nullable: true })
-  avatarUrl?: string;
+  avatarUrl?: string | null;
 
   @CreateDateColumn()
   createdAt!: Date;
@@ -37,8 +37,7 @@ export class ServerMember {
   updatedAt!: Date;
 
   @Column("timestamp", { nullable: true })
-  leftAt?: Date;
-
+  leftAt?: Date | null;
 
   @OneToMany(() => BlockedTerm, ({ author }) => author)
   blockedTerms!: BlockedTerm[];
