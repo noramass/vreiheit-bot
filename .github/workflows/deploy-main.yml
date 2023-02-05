@@ -44,5 +44,6 @@ jobs:
           force: true
           images: |
             ghcr.io/${{ secrets.GH_USERNAME }}/vreiheit-discord-bot:${{ github.sha }}
+            ghcr.io/${{ secrets.GH_USERNAME }}/vreiheit-discord-bot:${{ github.sha }}
           imagepullsecrets: |
             gh-registry-secret
