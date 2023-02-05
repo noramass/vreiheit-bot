@@ -5,5 +5,5 @@ export function modLog(
   guild: Guild,
   message: string | MessageCreateOptions | MessagePayload,
 ) {
-  return sendMessage(guild, "mod-chat", message);
+  return sendMessage(guild, "logbuch", message);
 }
