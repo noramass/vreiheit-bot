@@ -40,6 +40,7 @@ jobs:
           strategy: basic
           manifests: |
             manifests/deployment.yml
+          pull-images: false
           images: |
             ghcr.io/${{ secrets.GH_USERNAME }}/vreiheit-discord-bot:${{ github.sha }}
           imagepullsecrets: |
