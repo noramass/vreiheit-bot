@@ -1,5 +1,7 @@
 import { ActivityType } from "discord.js";
 import { registeredHandlers } from "src/decorators/handler";
+import { Server } from "src/entities/server";
+import { dataSource } from "src/init/data-source";
 import { client, generateInvite, withClient } from "src/init/discord";
 import { cyclePresence } from "src/presence/cycle-presence";
 import { getHierarchy, getHierarchyRole } from "src/roles/hierachy/hierachy";
@@ -8,11 +10,25 @@ import { cyclicIterator } from "src/util";
 import "./commands";
 import "./services";
 export async function initialise() {
+  await dataSource.initialize();
   const client = await withClient();
   const invite = generateInvite();
   console.log(`bot initialised!\ninvite with ${invite}!`);
 
   await client.guilds.fetch();
+  for (const guild of client.guilds.cache.values()) {
+    const preview = await guild.fetchPreview();
+    await dataSource.getRepository(Server).upsert(
+      {
+        discordId: guild.id,
+        name: guild.name,
+        icon: preview.iconURL(),
+        splash: preview.splashURL(),
+        description: preview.description,
+      },
+      ["discordId"],
+    );
+  }
 
   await cyclePresence([
     {
@@ -40,12 +56,10 @@ client.on("interactionCreate", async interaction => {
     if (id === cid || id.startsWith(cid + ":")) {
       const remaining =
         cid === "" ? id : id === cid ? "" : id.slice(cid.length + 1);
-      for (const handler of handlers) await handler(interaction, remaining);
+      for (const handler of handlers)
+        await handler(interaction, ...remaining.split(":"));
     }
   }
-
-  console.log(interaction.guild.name, interaction.id, id);
-  // await processPronounInteraction(interaction);
 });
 
 client.on("messageCreate", async message => {

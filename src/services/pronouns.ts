@@ -16,6 +16,7 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
+import { ensureCommand } from "src/commands/ensure-command";
 import {
   Handler,
   OnButton,
@@ -70,17 +71,13 @@ export class Pronouns {
 
   @OnInit()
   async onInit(client: Client<true>) {
-    for (const guild of client.guilds.cache.values()) {
-      const commands = await guild.commands.fetch();
-      const match = commands.find(it => it.name == "pronouns");
-      if (!match)
-        await guild.commands.create(
-          new SlashCommandBuilder()
-            .setName("pronouns")
-            .setDescription("Zeige die Pronomenselektion an")
-            .setDMPermission(false),
-        );
-    }
+    await ensureCommand(
+      client,
+      new SlashCommandBuilder()
+        .setName("pronouns")
+        .setDescription("Zeige die Pronomenselektion an")
+        .setDMPermission(false),
+    );
   }
 
   @OnCommand("pronouns")
@@ -164,7 +161,7 @@ export class Pronouns {
     const color =
       form.fields.getField("color", ComponentType.TextInput).value || "#86efac";
     const name = form.fields.getField("name", ComponentType.TextInput).value;
-    if (!name || name.length > 15) await form.followUp("Ungültige Pronomen");
+    if (!name || name.length > 20) await form.followUp("Ungültige Pronomen");
     else if (!/^#[0-9a-fA-F]{6}$/.test(color))
       await form.followUp("Ungültiger Farbcode");
     else {
@@ -174,37 +171,6 @@ export class Pronouns {
         name,
         color as any,
       );
-      await modLog(form.guild, {
-        embeds: [
-          new EmbedBuilder()
-            .setTitle("Benutzerdefinierte Pronomen: " + name)
-            .setFooter({
-              text: form.user.username,
-              iconURL: form.user.displayAvatarURL(),
-            })
-            .setColor(color as any),
-        ],
-        components: [
-          new ActionRowBuilder<ButtonBuilder>().addComponents(
-            new ButtonBuilder()
-              .setLabel("Löschen")
-              .setCustomId("pronouns:delete:" + form.user.id)
-              .setStyle(ButtonStyle.Secondary),
-            new ButtonBuilder()
-              .setLabel("Kicken")
-              .setCustomId("members:kick:" + form.user.id)
-              .setStyle(ButtonStyle.Danger),
-            new ButtonBuilder()
-              .setLabel("Bannen")
-              .setCustomId("members:ban:" + form.user.id)
-              .setStyle(ButtonStyle.Danger),
-            new ButtonBuilder()
-              .setLabel("Okay!")
-              .setCustomId("messages:delete")
-              .setStyle(ButtonStyle.Success),
-          ),
-        ],
-      });
     }
   }
 

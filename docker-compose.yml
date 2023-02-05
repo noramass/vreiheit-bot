@@ -1,0 +1,11 @@
+version: '3'
+services:
+  vreiheit_db:
+    image: 'postgres:latest'
+    container_name: vreiheit_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/:/var/lib/postgresql/data/
+    env_file:
+      - ".env.local"
