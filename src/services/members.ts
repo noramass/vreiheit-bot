@@ -1,4 +1,4 @@
-import { Guild, Interaction } from "discord.js";
+import { Interaction } from "discord.js";
 import { Handler, OnInteraction } from "src/decorators";
 import { modLog } from "src/logging/mod-log";
 import { isAbove } from "src/roles/hierachy/hierachy";

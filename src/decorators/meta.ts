@@ -14,21 +14,21 @@ export type Constructor<T = any, Args extends any[] = any> = (
 ) => T;
 export type InteractionHandler = (
   interaction: Interaction,
-  id: string,
+  ...params: string[]
 ) => PromiseOr<void>;
 export type ButtonHandler = (
   interaction: ButtonInteraction,
-  id: string,
+  ...params: string[]
 ) => PromiseOr<void>;
 export type CommandHandler = (
   interaction: CommandInteraction,
-  id: string,
+  ...params: string[]
 ) => PromiseOr<void>;
 export type MessageHandler = (message: Message) => PromiseOr<void>;
 export type MemberHandler = (member: GuildMember) => PromiseOr<void>;
 export type FormHandler = (
   interaction: ModalSubmitInteraction,
-  id: string,
+  ...params: string[]
 ) => PromiseOr<void>;
 export type InitHandler = (client: Client<true>) => PromiseOr<void>;
 export interface DiscordHandlerMeta {

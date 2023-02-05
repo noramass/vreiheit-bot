@@ -23,6 +23,10 @@ export function OnMemberLeave() {
   return createHandlerDecorator("memberLeave");
 }
 
+export function OnMessage() {
+  return createHandlerDecorator("message");
+}
+
 export function createHandlerDecorator(
   field: keyof DiscordHandlerMeta,
   id?: string,
