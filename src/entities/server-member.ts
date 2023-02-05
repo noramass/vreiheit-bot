@@ -7,15 +7,17 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from "typeorm";
 
 @Entity("member")
+@Unique("discordId_server", ["discordId", "guild"])
 export class ServerMember {
   @PrimaryGeneratedColumn("uuid")
   uuid!: string;
 
-  @Column("varchar", { unique: true })
+  @Column("varchar")
   discordId!: string;
 
   @Column("varchar")
