@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Service
+metadata:
+  name: vreiheit-postgres-service
+  labels:
+    app: vreiheit
+    ver: service
+spec:
+  selector:
+    matchLabels:
+      app: vreiheit
+      ver: postgres-deployment
+  ports:
+    - port: 5432

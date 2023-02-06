@@ -39,20 +39,13 @@ jobs:
         with:
           namespace: default
           secret-type: generic
-          secret-name: vreiheit-postgres-user
-          data: ${{ secrets.POSTGRES_USER }}
-      - uses: azure/k8s-create-secret@v4
-        with:
-          namespace: default
-          secret-type: generic
-          secret-name: vreiheit-postgres-password
-          data: ${{ secrets.POSTGRES_PASSWORD }}
+          secret-name: vreiheit-postgres
+          string-data: ${{ secrets.POSTGRES_ENV }}
       - uses: azure/k8s-deploy@v4
         with:
           action: deploy
           strategy: basic
-          manifests: |
-            manifests/deployment.yml
+          manifests: manifests
           pull-images: false
           images: |
             ghcr.io/${{ secrets.GH_USERNAME }}/vreiheit-bot:${{ github.sha }}
