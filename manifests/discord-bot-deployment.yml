@@ -22,7 +22,7 @@ spec:
           image: ghcr.io/eyyy-nora/vreiheit-bot
       env:
         - name: POSTGRES_USER
-          valueForm:
+          valueFrom:
             secretKeyRef:
               name: vreiheit-postgres
               key: username
