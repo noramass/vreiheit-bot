@@ -44,5 +44,5 @@ spec:
               name: pgdatavol
       volumes:
         - name: pgdatavol
-          persistentVolumeClaim:
-            claimName: vreiheit-postgres-pvc
+          hostPath:
+            path: /opt/vreiheit/data
