@@ -6,9 +6,12 @@ metadata:
     app: vreiheit
     ver: postgres-pv
 spec:
-  storageClassName: ""
   capacity:
     storage: 10Gi
+  volumeMode: Filesystem
   accessModes:
     - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /opt/vreiheit/data
