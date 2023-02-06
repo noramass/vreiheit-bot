@@ -60,7 +60,7 @@ export class GlobalSlowmodeService {
   @OnCommand("slowmode")
   async onSlowmodeCommand(interaction: CommandInteraction) {
     await interaction.deferReply({ ephemeral: true });
-    if (!interaction.memberPermissions.has("ManageChannels"))
+    if (!interaction.memberPermissions.has("Administrator"))
       return await interaction.editReply(
         "Du hast nicht die Berechtigung um Kanäle zu verwalten.",
       );
