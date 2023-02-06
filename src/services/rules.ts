@@ -116,7 +116,7 @@ export class RulesService {
   }
 
   async getRuleTexts(id: string): Promise<string[]> {
-    const ruleTexts = chunks<string>((await getServer(id)).rules ?? "", 1024);
+    const ruleTexts = chunks<string>((await getServer(id)).rules ?? "", 4000);
     while (ruleTexts.length < 5) ruleTexts.push("");
     return ruleTexts;
   }
