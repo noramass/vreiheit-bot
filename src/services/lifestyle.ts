@@ -47,7 +47,7 @@ export class LifestyleService {
       new SlashCommandBuilder()
         .setName("set-not-vegan-role")
         .setDMPermission(false)
-        .setDescription("Setzt die night vegane Lifestyle-Rolle")
+        .setDescription("Setzt die nicht vegane Lifestyle-Rolle")
         .addRoleOption(builder =>
           builder.setName("role").setDescription("Rolle").setRequired(true),
         ),
