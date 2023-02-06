@@ -139,9 +139,7 @@ export class LifestyleService {
     if (roles.cache.has(newComer)) await roles.remove(newComer);
     return await this.tempReply(
       interaction,
-      `Deine Lebenseinstellung ist auf ${
-        on ? "Vegan" : "Nicht Vegan"
-      } gesetzt!`,
+      `Deine Lebenseinstellung ist auf gesetzt!`,
     );
   }
 
