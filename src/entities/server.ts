@@ -53,6 +53,9 @@ export class Server {
   @Column("varchar", { nullable: true })
   rules?: string;
 
+  @Column("jsonb", { default: {} })
+  pronouns!: Record<string, string> & { other: string[] };
+
   @CreateDateColumn()
   createdAt!: Date;
 

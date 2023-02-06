@@ -10,7 +10,6 @@ import {
   GuildMember,
   ModalBuilder,
   ModalSubmitInteraction,
-  Role,
   SlashCommandBuilder,
   TextInputBuilder,
   TextInputStyle,
@@ -26,8 +25,6 @@ import {
 } from "src/decorators";
 import { withServerMember } from "src/members/get-server-member";
 import { ensureRolesExist } from "src/roles/ensure-roles-exist";
-import { getRolesMatching } from "src/roles/get-roles-matching";
-import { rolesByName } from "src/roles/role-by-name";
 import { chunks, createInverseLookup } from "src/util";
 
 @Handler("pronouns")
@@ -68,6 +65,10 @@ export class Pronouns {
     mentionable: false,
   } as const;
 
+  pronounCache: Record<string, Record<string, string>> = {};
+  otherPronounCache: Record<string, string[]> = {};
+  pronounNames: Record<string, Record<string, string>> = {};
+
   @OnInit()
   async onInit(client: Client<true>) {
     await ensureCommand(
@@ -77,6 +78,24 @@ export class Pronouns {
         .setDescription("Zeige die Pronomenselektion an")
         .setDMPermission(false),
     );
+    for (const guild of client.guilds.cache.values()) {
+      await this.ensureRolesExist(guild);
+      for (const role of guild.roles.cache.values())
+        if (
+          role.name.startsWith(this.prefix()) &&
+          !this.pronounNames[guild.id][role.id]
+        ) {
+          (this.otherPronounCache[guild.id] ??= []).push(role.id);
+          (this.pronounNames[guild.id] ??= {})[role.id] = this.stripPrefix(
+            role.name,
+          );
+        }
+      console.log(
+        this.pronounCache[guild.id],
+        this.pronounNames[guild.id],
+        this.otherPronounCache[guild.id],
+      );
+    }
   }
 
   @OnCommand("pronouns")
@@ -106,7 +125,8 @@ export class Pronouns {
     await interaction.deferUpdate();
     await this.togglePronounRole(
       interaction.member as GuildMember,
-      remainingPrefix,
+      this.pronounCache[interaction.guildId][remainingPrefix] ??
+        remainingPrefix,
     );
   }
 
@@ -177,8 +197,7 @@ export class Pronouns {
   async onMemberLeave(member: GuildMember) {
     const other = await this.getCustomPronouns(member.guild);
     for (const role of other)
-      if (member.roles.cache.has(role.id))
-        await member.guild.roles.delete(role);
+      if (member.roles.cache.has(role)) await member.guild.roles.delete(role);
   }
 
   async createCustomPronounRole(
@@ -191,6 +210,8 @@ export class Pronouns {
       name: this.prefix(pronouns),
       color,
     });
+    (this.otherPronounCache[member.guild.id] ??= []).push(role.id);
+    this.pronounNames[member.guild.id][role.id] = pronouns;
     await this.togglePronounRole(member, role.id);
   }
 
@@ -199,31 +220,32 @@ export class Pronouns {
     const roles = member.roles.cache;
     const { other, ...primary } = await this.getPronouns(member.guild);
     const pronouns = Object.values(primary).concat(...other);
-    if (!/^[0-9]+$/.test(roleId))
-      roleId = pronouns.find(it => it.name === this.prefix(roleId)).id;
-    let added: Role;
-    for (const role of pronouns) {
-      const has = roles.has(role.id);
-      const match = role.id === roleId;
+    let added: string;
+    for (const role of pronouns as string[]) {
+      const has = roles.has(role);
+      const match = role === roleId;
       if ((has && match) || !match) {
-        await member.roles.remove(role);
-        if (has && other.find(it => it.id === role.id))
+        if (has) await member.roles.remove(role);
+        if (has && other.includes(role)) {
           await member.guild.roles.delete(role);
+          other.splice(other.indexOf(role), 1);
+        }
       } else if (match) await member.roles.add((added = role));
     }
     await withServerMember(member, user => {
-      user.pronouns = added && this.stripPrefix(added.name);
+      user.pronouns = this.pronounNames[member.guild.id][added] ?? added;
     });
   }
 
   async primaryPronounButtons(guild: Guild) {
     const pronouns = await this.getPrimaryPronouns(guild);
+    const names = createInverseLookup(pronouns, this.stripPrefix.bind(this));
     const buttons = Object.values(pronouns)
       .map(role =>
         new ButtonBuilder()
-          .setCustomId("pronouns:set:" + this.stripPrefix(role.name))
+          .setCustomId(`pronouns:set:${role}`)
           .setStyle(ButtonStyle.Primary)
-          .setLabel(this.stripPrefix(role.name)),
+          .setLabel(names[role]),
       )
       .concat(
         new ButtonBuilder()
@@ -237,50 +259,35 @@ export class Pronouns {
   }
 
   async getPrimaryPronouns(guild: Guild) {
-    await this.ensureRolesExist(guild);
-    const matching = await rolesByName(
-      guild,
-      Object.values(this.pronounRoles).map(({ name }) => name),
-    );
-    const results: Record<keyof this["pronounRoles"], Role> = {} as any;
-    const names = createInverseLookup(this.pronounRoles, ({ name }) => name);
-    for (const role of matching.values()) {
-      const key = names[role.name];
-      if (key) results[key] = role;
-    }
-    return results;
+    return this.pronounCache[guild.id];
   }
 
   async getPronouns(guild: Guild) {
-    await this.ensureRolesExist(guild);
-    const matching = await getRolesMatching(guild, ({ name }) =>
-      name.startsWith(this.prefix()),
-    );
-    const results: Record<keyof this["pronounRoles"], Role> & {
-      other: Role[];
-    } = { other: [] } as any;
-    const names = createInverseLookup(this.pronounRoles, ({ name }) => name);
-    for (const role of matching.values()) {
-      const key = names[role.name];
-      if (key) results[key] = role;
-      else results.other.push(role);
-    }
-    return results;
+    return {
+      ...this.pronounCache[guild.id],
+      other: this.otherPronounCache[guild.id],
+    };
   }
 
   async getCustomPronouns(guild: Guild) {
-    const { other } = await this.getPronouns(guild);
-    return other;
+    return this.otherPronounCache[guild.id];
   }
 
   async ensureRolesExist(guild: Guild) {
-    return ensureRolesExist(
+    if (this.pronounCache[guild.id]) return;
+    const roles = await ensureRolesExist(
       guild,
       Object.values(this.pronounRoles).map(role => ({
         ...this.pronounRolesShared,
         ...role,
       })),
     );
+    this.pronounCache[guild.id] ??= {};
+    this.pronounNames[guild.id] ??= {};
+    for (const role of roles) {
+      this.pronounCache[guild.id][this.stripPrefix(role.name)] = role.id;
+      this.pronounNames[guild.id][role.id] = this.stripPrefix(role.name);
+    }
   }
 
   prefix(name: string = "") {
