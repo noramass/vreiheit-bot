@@ -1,10 +1,13 @@
 import { Interaction } from "discord.js";
-import { Handler, OnInteraction } from "src/decorators";
+import { Handler, InjectService, OnInteraction } from "src/decorators";
 import { modLog } from "src/logging/mod-log";
-import { isAbove } from "src/roles/hierachy/hierachy";
+import { HierarchyService } from "src/services/hierarchy";
 
 @Handler("members")
 export class Members {
+  @InjectService(() => HierarchyService)
+  hierarchy!: HierarchyService;
+
   @OnInteraction("kick")
   async onKick(interaction: Interaction, userId: string, reason?: string) {
     if ("deferReply" in interaction)
@@ -16,7 +19,7 @@ export class Members {
       return this.reply(interaction, "Dieses Mitglied existiert nicht");
     if (target.id === interaction.user.id)
       return this.reply(interaction, "Du kannst dich nicht selber kicken!");
-    if (!(await isAbove(interaction.member as any, target)))
+    if (!(await this.hierarchy.isAbove(interaction.member as any, target)))
       return this.reply(
         interaction,
         "Du hast nicht die Berechtigung, dieses Mitglied zu kicken!",
@@ -47,7 +50,7 @@ export class Members {
       return this.reply(interaction, "Dieses Mitglied existiert nicht");
     if (target.id === interaction.user.id)
       return this.reply(interaction, "Du kannst dich nicht selber bannen!");
-    if (!(await isAbove(interaction.member as any, target)))
+    if (!(await this.hierarchy.isAbove(interaction.member as any, target)))
       return this.reply(
         interaction,
         "Du hast nicht die Berechtigung, dieses Mitglied zu bannen!",
