@@ -79,13 +79,7 @@ export class BlockedTermsService {
           builder
             .setName("pattern")
             .setRequired(true)
-            .setDescription("Das zu entfernende Blockpattern")
-            .addChoices(
-              ...(this.blockedTermsMap[guild.id] ?? []).map(term => ({
-                name: term.pattern.source,
-                value: term.id.toString(),
-              })),
-            ),
+            .setDescription("Das zu entfernende Blockpattern"),
         ),
     );
   }

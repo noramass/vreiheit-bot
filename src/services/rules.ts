@@ -49,7 +49,7 @@ export class RulesService {
 
   @OnButton("accept")
   async onRulesAccept(interaction: ButtonInteraction) {
-    await interaction.deferUpdate();
+    // await interaction.deferUpdate();
     await withServerMember(interaction.member as any, user => {
       user.rulesAccepted = true;
     });
