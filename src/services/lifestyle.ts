@@ -103,21 +103,22 @@ export class LifestyleService {
   @OnButton("vegan")
   async onLifestyleVegan(interaction: ButtonInteraction) {
     await interaction.deferReply({ ephemeral: true });
-    const [on, off] = await this.roles(interaction.guild);
-    await this.toggleLifestyleRole(interaction, on, off);
+    const [on, off, newComer] = await this.roles(interaction.guild);
+    await this.toggleLifestyleRole(interaction, on, off, newComer);
   }
 
   @OnButton("not-vegan")
   async onLifestyleNotVegan(interaction: ButtonInteraction) {
     await interaction.deferReply({ ephemeral: true });
-    const [off, on] = await this.roles(interaction.guild);
-    await this.toggleLifestyleRole(interaction, on, off);
+    const [off, on, newComer] = await this.roles(interaction.guild);
+    await this.toggleLifestyleRole(interaction, on, off, newComer);
   }
 
   async toggleLifestyleRole(
     interaction: ButtonInteraction,
     on?: Role,
     off?: Role,
+    newComer?: Role,
   ) {
     if (!on || !off) return await interaction.deleteReply();
     const user = await getServerMember(interaction.member as any);
@@ -135,7 +136,11 @@ export class LifestyleService {
     const roles = (interaction.member as GuildMember).roles;
     if (roles.cache.has(off.id)) await roles.remove(off);
     if (!roles.cache.has(on.id)) await roles.add(on);
-    return await interaction.editReply(`Lifestyle auf ${on.name} gesetzt!`);
+    if (roles.cache.has(newComer.id)) await roles.remove(newComer);
+    return await this.tempReply(
+      interaction,
+      `Lifestyle auf ${on.name} gesetzt!`,
+    );
   }
 
   async roles(guild: Guild) {
@@ -143,6 +148,7 @@ export class LifestyleService {
     return [
       server.veganRoleId && (await guild.roles.fetch(server.veganRoleId)),
       server.notVeganRoleId && (await guild.roles.fetch(server.notVeganRoleId)),
+      server.newComerRoleId && (await guild.roles.fetch(server.newComerRoleId)),
     ];
   }
 
