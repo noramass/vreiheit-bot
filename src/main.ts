@@ -1,4 +1,4 @@
-import { ActivityType } from "discord.js";
+import { ActionRowBuilder, ActivityType, ButtonBuilder, ButtonStyle } from "discord.js";
 import { registeredHandlers } from "src/decorators/handler";
 import { Server } from "src/entities/server";
 import { dataSource } from "src/init/data-source";
@@ -69,24 +69,59 @@ client.on("messageCreate", async message => {
     await handler(message);
   };
 
-  if (!message.author.bot)
-  {
+  if (!message.author.bot) {
     let channel = await findChannel(message.guild, message.channelId);
-    await modLog(message.guild, `In **${channel.name}** schrieb **${message.author.username}#${message.author.discriminator}**: "${message.content}"`);
+    await modLog(message.guild, {
+      content: `In **${channel.name}** schrieb **${message.author.username}#${message.author.discriminator}**: "${message.content}"`,
+      components: [
+        new ActionRowBuilder<ButtonBuilder>().addComponents(
+          new ButtonBuilder()
+            .setLabel("Löschen")
+            .setCustomId(`messages:delete:${message.channelId}:${message.id}`)
+            .setStyle(ButtonStyle.Danger),
+          new ButtonBuilder()
+            .setLabel("Kicken")
+            .setCustomId(`members:kick:${message.author.id}:Unangebrachte Nachricht`)
+            .setStyle(ButtonStyle.Danger),
+          new ButtonBuilder()
+            .setLabel("Bannen")
+            .setCustomId(`members:ban:${message.author.id}:Unangebrachte Nachricht`)
+            .setStyle(ButtonStyle.Danger),
+        ),
+      ],
+    });
   };
 });
 
 client.on("messageUpdate", async (oldMessage, newMessage) => {
   if (!newMessage.author.bot) {
     let channel = await findChannel(newMessage.guild, newMessage.channelId);
-    await modLog(newMessage.guild, `In **${channel.name}** überarbeitete **${newMessage.author.username}#${newMessage.author.discriminator}**: "${oldMessage.content}" zu "${newMessage.content}"`);
+    await modLog(newMessage.guild, {
+      content: `In **${channel.name}** überarbeitete **${newMessage.author.username}#${newMessage.author.discriminator}**: "${oldMessage.content}" zu "${newMessage.content}"`,
+      components: [
+        new ActionRowBuilder<ButtonBuilder>().addComponents(
+          new ButtonBuilder()
+            .setLabel("Löschen")
+            .setCustomId(`messages:delete:${newMessage.channelId}:${newMessage.id}`)
+            .setStyle(ButtonStyle.Danger),
+          new ButtonBuilder()
+            .setLabel("Kicken")
+            .setCustomId(`members:kick:${newMessage.author.id}:Unangebrachte Nachricht`)
+            .setStyle(ButtonStyle.Danger),
+          new ButtonBuilder()
+            .setLabel("Bannen")
+            .setCustomId(`members:ban:${newMessage.author.id}:Unangebrachte Nachricht`)
+            .setStyle(ButtonStyle.Danger),
+        ),
+      ],
+    });
   }
 });
 
 client.on("messageDelete", async message => {
   if (!message.author.bot) {
     let channel = await findChannel(message.guild, message.channelId);
-    await modLog(message.guild, `In **${channel.name}** löscht **${message.author.username}#${message.author.discriminator}**: "${message.content}"`);
+    await modLog(message.guild, `In **${channel.name}** wurde Nachricht von **${message.author.username}#${message.author.discriminator}** gelöscht: "${message.content}"`);
   }
 });
 
