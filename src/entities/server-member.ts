@@ -44,6 +44,9 @@ export class ServerMember {
   @UpdateDateColumn()
   updatedAt!: Date;
 
+  @Column("boolean", { default: false })
+  maySpeak!: boolean;
+
   @Column("timestamp", { nullable: true })
   leftAt?: Date | null;
 
