@@ -102,7 +102,7 @@ export class HierarchyService {
       const server = await getServer(guild.id);
       this.hierarchies[guild.id] = (
         await Promise.all(
-          server.hierarchy?.split(";").map(id => guild.roles.fetch(id)) ?? [],
+          server.hierarchy?.split(";").map(id => guild.roles.cache.has(id) ? guild.roles.cache.get(id) : guild.roles.fetch(id)) ?? [],
         )
       ).filter(it => it);
     }
@@ -128,7 +128,7 @@ export class HierarchyService {
         )
         .getMany();
       for (const user of users) {
-        const member = await guild.members.fetch(user.discordId);
+        const member = guild.members.cache.has(user.discordId) ? guild.members.cache.get(user.discordId)  : await guild.members.fetch(user.discordId);
         await member.roles.add(speakerRole);
         user.maySpeak = true;
       }
@@ -217,17 +217,17 @@ export class HierarchyService {
 
   async newComerRole(guild: Guild) {
     const id = (await getServer(guild.id)).newComerRoleId;
-    return id && guild.roles.fetch(id);
+    return id && (guild.roles.cache.has(id) ? guild.roles.cache.get(id) : guild.roles.fetch(id));
   }
 
   async botRole(guild: Guild) {
     const id = (await getServer(guild.id)).botRoleId;
-    return id && guild.roles.fetch(id);
+    return id && (guild.roles.cache.has(id) ? guild.roles.cache.get(id) : guild.roles.fetch(id));
   }
 
   async speakerRole(guild: Guild) {
     const id = (await getServer(guild.id)).speakerRoleId;
-    return id && guild.roles.fetch(id);
+    return id && (guild.roles.cache.has(id) ? guild.roles.cache.get(id) : guild.roles.fetch(id));
   }
 
   getHierarchy(guild: Guild) {
