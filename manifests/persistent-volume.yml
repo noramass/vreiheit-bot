@@ -16,9 +16,10 @@ spec:
   local:
     path: /opt/vreiheit/data
   nodeAffinity:
-    nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-            - propero.dev
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+          - key: kubernetes.io/hostname
+            operator: In
+            values:
+              - propero.dev
