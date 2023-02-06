@@ -7,8 +7,7 @@ metadata:
     ver: service
 spec:
   selector:
-    matchLabels:
-      app: vreiheit
-      ver: postgres-deployment
+    app: vreiheit
+    ver: postgres-deployment
   ports:
     - port: 5432
