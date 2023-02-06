@@ -35,6 +35,9 @@ export class ServerMember {
   @Column("varchar", { nullable: true })
   avatarUrl?: string | null;
 
+  @Column("varchar", { nullable: true })
+  hierarchyRole?: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 
