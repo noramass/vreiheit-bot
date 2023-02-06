@@ -10,7 +10,7 @@ export class Messages {
     messageId: string,
     force?: string,
   ) {
-    if (force || !interaction.memberPermissions.has("ManageMessages"))
+    if (!force && !interaction.memberPermissions.has("ManageMessages"))
       return this.reply(
         interaction,
         "Du kannst keine Nachrichten verwalten...",
