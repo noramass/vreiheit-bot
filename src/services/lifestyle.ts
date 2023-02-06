@@ -7,6 +7,8 @@ import {
   CommandInteraction,
   Guild,
   GuildMember,
+  MessageCreateOptions,
+  MessagePayload,
   Role,
   SlashCommandBuilder,
 } from "discord.js";
@@ -17,6 +19,7 @@ import {
   getServerMember,
   withServer,
 } from "src/members/get-server-member";
+import { sleep } from "src/util";
 
 @Handler("lifestyle")
 export class LifestyleService {
@@ -119,11 +122,13 @@ export class LifestyleService {
     if (!on || !off) return await interaction.deleteReply();
     const user = await getServerMember(interaction.member as any);
     if (!user.rulesAccepted)
-      return await interaction.editReply(
+      return await this.tempReply(
+        interaction,
         "Du musst zuerst die Regeln akzeptieren.",
       );
     if (!user.pronouns)
-      return await interaction.editReply(
+      return await this.tempReply(
+        interaction,
         "Du musst zuerst deine Pronomen festlegen.",
       );
     await (interaction.member as GuildMember).fetch();
@@ -139,5 +144,16 @@ export class LifestyleService {
       server.veganRoleId && (await guild.roles.fetch(server.veganRoleId)),
       server.notVeganRoleId && (await guild.roles.fetch(server.notVeganRoleId)),
     ];
+  }
+
+  async tempReply(
+    interaction: ButtonInteraction,
+    message: MessagePayload | string | MessageCreateOptions,
+    ms = 5000,
+  ) {
+    if (interaction.deferred) await interaction.editReply(message);
+    else await interaction.reply(message as any);
+    await sleep(ms);
+    await interaction.deleteReply();
   }
 }
