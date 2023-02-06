@@ -1,27 +1,61 @@
-import { Interaction } from "discord.js";
-import { registerService } from "src/decorators/inject";
 import {
-  DiscordHandlerMeta,
-  getMeta,
-  InitHandler,
-  InteractionHandler,
-  MemberHandler,
-  MessageHandler,
-} from "src/decorators/meta";
+  Client,
+  GuildBan,
+  GuildMember,
+  Interaction,
+  Message,
+  Role,
+} from "discord.js";
+import { registerService } from "src/decorators/inject";
+import { DiscordHandlerMeta, getMeta } from "src/decorators/meta";
+import { PromiseOr } from "src/util";
 
-export const registeredHandlers: {
-  memberJoin: MemberHandler[];
-  memberLeave: MemberHandler[];
-  message: MessageHandler[];
-  init: InitHandler[];
-  interaction: Record<string, InteractionHandler[]>;
-} = {
-  memberJoin: [],
-  memberLeave: [],
-  message: [],
-  init: [],
-  interaction: {},
-};
+export type UpdateHandler<T> = (
+  oldVal: T | Partial<T>,
+  newVal: T,
+) => PromiseOr<void>;
+export type RegularHandler<T> = (val: T) => PromiseOr<void>;
+export type IdHandler<T> = (val: T, ...params: string[]) => PromiseOr<void>;
+
+export interface HandlerMap {
+  memberJoin: RegularHandler<GuildMember>[];
+  memberLeave: RegularHandler<GuildMember>[];
+  memberUpdate: UpdateHandler<GuildMember>[];
+
+  ban: RegularHandler<GuildBan>[];
+  unban: RegularHandler<GuildBan>[];
+
+  roleCreate: RegularHandler<Role>[];
+  roleDelete: RegularHandler<Role>[];
+  roleUpdate: UpdateHandler<Role>[];
+
+  messageCreate: RegularHandler<Message>[];
+  messageDelete: RegularHandler<Message>[];
+  messageUpdate: UpdateHandler<Message>[];
+
+  init: RegularHandler<Client<true>>[];
+  interaction: IdHandler<Interaction>[];
+}
+
+export const registeredHandlers: HandlerMap = emptyHandlerMap();
+
+export function emptyHandlerMap(): HandlerMap {
+  return {
+    memberJoin: [],
+    memberLeave: [],
+    memberUpdate: [],
+    ban: [],
+    unban: [],
+    roleCreate: [],
+    roleDelete: [],
+    roleUpdate: [],
+    messageCreate: [],
+    messageDelete: [],
+    messageUpdate: [],
+    init: [],
+    interaction: [],
+  };
+}
 
 export function Handler(prefix: string = "") {
   return function (cls: any) {
@@ -30,109 +64,17 @@ export function Handler(prefix: string = "") {
     const instance = new (cls as any)();
     registerService(cls, instance);
     const handlerMap = createHandlers(instance, meta);
-    for (const [key, handlers] of Object.entries(handlerMap)) {
-      const registered = registeredHandlers[key];
-      if (Array.isArray(registered)) registered.push(...(handlers as any));
-      else {
-        for (const [prefix, subHandlers] of Object.entries(handlers)) {
-          (registered[prefix] ??= []).push(...subHandlers);
-        }
-      }
-    }
+    for (const [key, handlers] of Object.entries(handlerMap))
+      registeredHandlers[key].push(...handlers);
   };
 }
 
 function createHandlers(instance: any, meta: DiscordHandlerMeta) {
-  const handlerMap = {
-    memberJoin: [],
-    memberLeave: [],
-    interaction: {},
-    message: [],
-    init: [],
-  };
-
-  const prefix = meta.prefix;
-  function pre(str: string) {
-    if (str.startsWith("-")) return str.slice(1);
-    if (!prefix) return str;
-    return `${prefix}:${str}`;
-  }
-
-  for (const [key, value] of Object.entries(meta)) {
-    switch (key as keyof DiscordHandlerMeta) {
-      case "prefix":
-        continue;
-      case "init":
-        handlerMap.init.push(...(value[""] ?? []).map(it => it.bind(instance)));
-        break;
-      case "message":
-        handlerMap.message.push(
-          ...(value[""] ?? []).map(it => it.bind(instance)),
-        );
-        break;
-      case "memberJoin":
-        handlerMap.memberJoin.push(
-          ...(value[""] ?? []).map(it => it.bind(instance)),
-        );
-        break;
-      case "memberLeave":
-        handlerMap.memberLeave.push(
-          ...(value[""] ?? []).map(it => it.bind(instance)),
-        );
-        break;
-      case "button":
-        for (const [key, handlers] of Object.entries(value)) {
-          const fullPrefix = pre(key);
-          (handlerMap.interaction[fullPrefix] ??= []).push(
-            ...(handlers as any).map(handler => {
-              return (interaction: Interaction, ...params: string[]) => {
-                if (!interaction.isButton()) return;
-                return handler.call(instance, interaction, ...params);
-              };
-            }),
-          );
-        }
-        break;
-      case "command":
-        for (const [key, handlers] of Object.entries(value)) {
-          (handlerMap.interaction[""] ??= []).push(
-            ...(handlers as any).map(handler => {
-              return (interaction: Interaction, ...params: string[]) => {
-                if (!interaction.isCommand()) return;
-                if (interaction.commandName !== key) return;
-                return handler.call(instance, interaction, ...params);
-              };
-            }),
-          );
-        }
-        break;
-      case "form":
-        for (const [key, handlers] of Object.entries(value)) {
-          const fullPrefix = pre(key);
-          (handlerMap.interaction[fullPrefix] ??= []).push(
-            ...(handlers as any).map(handler => {
-              return (interaction: Interaction, ...params: string[]) => {
-                if (!interaction.isModalSubmit()) return;
-                return handler.call(instance, interaction, ...params);
-              };
-            }),
-          );
-        }
-        break;
-      case "interaction":
-        for (const [key, handlers] of Object.entries(value)) {
-          const fullPrefix = pre(key);
-          (handlerMap.interaction[fullPrefix] ??= []).push(
-            ...(handlers as any).map(handler => {
-              return (interaction: Interaction, ...params: string[]) => {
-                return handler.call(instance, interaction, ...params);
-              };
-            }),
-          );
-        }
-        break;
-    }
-  }
-
-  return handlerMap;
+  const { handlers } = meta;
+  return Object.fromEntries(
+    Object.entries(handlers).map(([key, handlers]) => [
+      key,
+      handlers.map(handler => handler.bind(instance)),
+    ]),
+  );
 }

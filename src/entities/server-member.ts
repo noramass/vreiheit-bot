@@ -29,6 +29,9 @@ export class ServerMember {
   @Column("varchar", { nullable: true })
   pronouns?: string;
 
+  @Column("boolean", { default: false })
+  rulesAccepted!: boolean;
+
   @Column("varchar", { nullable: true })
   avatarUrl?: string | null;
 

@@ -29,6 +29,12 @@ export class Server {
   @Column("varchar", { nullable: true })
   splash?: string;
 
+  @Column("varchar", { nullable: true })
+  modLogChannel?: string;
+
+  @Column("varchar", { nullable: true })
+  rules?: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 
