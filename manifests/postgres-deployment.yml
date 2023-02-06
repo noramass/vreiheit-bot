@@ -42,7 +42,7 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: pgdatavol
-    volumes:
-      - name: pgdatavol
-        persistentVolumeClaim:
-          claimName: vreiheit-postgres-pvc
+      volumes:
+        - name: pgdatavol
+          persistentVolumeClaim:
+            claimName: vreiheit-postgres-pvc
