@@ -22,7 +22,7 @@ spec:
           image: postgres:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 5324
+            - containerPort: "5324"
           env:
             - name: POSTGRES_USER
               valueFrom:

@@ -11,4 +11,4 @@ spec:
       app: vreiheit
       ver: postgres-deployment
   ports:
-    - port: 5432
+    - port: "5432"
