@@ -198,7 +198,7 @@ export class HierarchyService {
         if (user.hierarchyRole) return;
         const role = await this.newComerRole(member.guild);
         if (role) await member.roles.add(role);
-        user.hierarchyRole = role?.id;
+        user.hierarchyRole = role;
       });
   }
 
@@ -216,18 +216,15 @@ export class HierarchyService {
   }
 
   async newComerRole(guild: Guild) {
-    const id = (await getServer(guild.id)).newComerRoleId;
-    return id && guild.roles.fetch(id);
+    return (await getServer(guild.id)).newComerRoleId;
   }
 
   async botRole(guild: Guild) {
-    const id = (await getServer(guild.id)).botRoleId;
-    return id && guild.roles.fetch(id);
+    return (await getServer(guild.id)).botRoleId;
   }
 
   async speakerRole(guild: Guild) {
-    const id = (await getServer(guild.id)).speakerRoleId;
-    return id && guild.roles.fetch(id);
+    return (await getServer(guild.id)).speakerRoleId;
   }
 
   getHierarchy(guild: Guild) {

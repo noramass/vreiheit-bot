@@ -22,7 +22,7 @@ export async function getServerMember(member: GuildMember, save = true) {
   user.username = member.user.username;
   user.discriminator = member.user.discriminator;
   user.avatarUrl = member.displayAvatarURL();
-  await dataSource.getRepository(ServerMember).save(user);
+  if (save) await dataSource.getRepository(ServerMember).save(user);
   return user;
 }
 
