@@ -33,6 +33,15 @@ export class Server {
   modLogChannel?: string;
 
   @Column("varchar", { nullable: true })
+  newComerRoleId?: string;
+
+  @Column("varchar", { nullable: true })
+  botRoleId?: string;
+
+  @Column("varchar", { nullable: true })
+  speakerRoleId?: string;
+
+  @Column("varchar", { nullable: true })
   rules?: string;
 
   @CreateDateColumn()

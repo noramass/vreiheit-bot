@@ -35,11 +35,17 @@ export class ServerMember {
   @Column("varchar", { nullable: true })
   avatarUrl?: string | null;
 
+  @Column("varchar", { nullable: true })
+  hierarchyRole?: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @Column("boolean", { default: false })
+  maySpeak!: boolean;
 
   @Column("timestamp", { nullable: true })
   leftAt?: Date | null;
