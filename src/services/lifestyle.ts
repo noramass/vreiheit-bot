@@ -116,9 +116,9 @@ export class LifestyleService {
 
   async toggleLifestyleRole(
     interaction: ButtonInteraction,
-    on?: Role,
-    off?: Role,
-    newComer?: Role,
+    on?: string,
+    off?: string,
+    newComer?: string,
   ) {
     if (!on || !off) return await interaction.deleteReply();
     const user = await getServerMember(interaction.member as any);
@@ -134,22 +134,20 @@ export class LifestyleService {
       );
     await (interaction.member as GuildMember).fetch();
     const roles = (interaction.member as GuildMember).roles;
-    if (roles.cache.has(off.id)) await roles.remove(off);
-    if (!roles.cache.has(on.id)) await roles.add(on);
-    if (roles.cache.has(newComer.id)) await roles.remove(newComer);
+    if (roles.cache.has(off)) await roles.remove(off);
+    if (!roles.cache.has(on)) await roles.add(on);
+    if (roles.cache.has(newComer)) await roles.remove(newComer);
     return await this.tempReply(
       interaction,
-      `Deine Lebenseinstellung ist auf ${on.name} gesetzt!`,
+      `Deine Lebenseinstellung ist auf ${
+        on ? "Vegan" : "Nicht Vegan"
+      } gesetzt!`,
     );
   }
 
   async roles(guild: Guild) {
     const server = await getServer(guild.id);
-    return [
-      server.veganRoleId && (await guild.roles.fetch(server.veganRoleId)),
-      server.notVeganRoleId && (await guild.roles.fetch(server.notVeganRoleId)),
-      server.newComerRoleId && (await guild.roles.fetch(server.newComerRoleId)),
-    ];
+    return [server.veganRoleId, server.notVeganRoleId, server.newComerRoleId];
   }
 
   async tempReply(
