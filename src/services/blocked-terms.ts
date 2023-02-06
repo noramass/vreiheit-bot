@@ -70,7 +70,8 @@ export class BlockedTermsService {
             .setRequired(false),
         ),
     );
-    await ensureCommand(client, guild =>
+    await ensureCommand(
+      client,
       new SlashCommandBuilder()
         .setName("delete-blocked-term")
         .setDMPermission(false)
@@ -232,7 +233,7 @@ export class BlockedTermsService {
             .setStyle(ButtonStyle.Danger),
           new ButtonBuilder()
             .setLabel("Okay!")
-            .setCustomId("messages:delete")
+            .setCustomId("messages:delete:::1")
             .setStyle(ButtonStyle.Success),
         ),
       ],
