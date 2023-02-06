@@ -8,7 +8,7 @@ spec:
       app: vreiheit-postgres-pv
       ver: vreiheit-postgres-01-pv
   accessModes:
-    - ReadWriteMany
+  - ReadWriteMany
   resources:
     requests:
       storage: 10Gi

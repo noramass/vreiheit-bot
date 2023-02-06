@@ -7,4 +7,4 @@ data:
   POSTGRES_USER: vreiheit-postgres-user
   POSTGRES_PASSWORD: vreiheit-postgres-password
   PGDATA: /var/lib/postgresql/data
-  
+  POSTGRES_PORT: "5432"
