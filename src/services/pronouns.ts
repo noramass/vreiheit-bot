@@ -24,12 +24,10 @@ import {
   OnInit,
   OnMemberLeave,
 } from "src/decorators";
-import { Server } from "src/entities/server";
-import { ServerMember } from "src/entities/server-member";
+import { withServerMember } from "src/members/get-server-member";
 import { ensureRolesExist } from "src/roles/ensure-roles-exist";
 import { getRolesMatching } from "src/roles/get-roles-matching";
 import { rolesByName } from "src/roles/role-by-name";
-import { dataSource } from "src/init/data-source";
 import { chunks, createInverseLookup } from "src/util";
 
 @Handler("pronouns")
@@ -110,39 +108,6 @@ export class Pronouns {
       interaction.member as GuildMember,
       remainingPrefix,
     );
-
-    const server = await dataSource.getRepository(Server).findOne({
-      where: {
-        discordId: interaction.guild.id,
-      },
-    });
-
-    let user = await dataSource
-      .getRepository(ServerMember)
-      .createQueryBuilder("members")
-      .leftJoinAndSelect("members.guild", "server")
-      .where("members.discordId = :userId AND server.discordId = :serverId", {
-        userId: interaction.user.id,
-        serverId: interaction.guild.id,
-      })
-      .getOne();
-    if (user == null) {
-      user = new ServerMember();
-      user.discordId = interaction.member.user.id;
-      user.createdAt = new Date();
-      user.discriminator = ""; // @todo keine ahnung was hier rein muss
-      user.pronouns = remainingPrefix;
-      user.username = interaction.member.user.username;
-      user.avatarUrl = interaction.member.user.avatar;
-      user.guild = server;
-    }
-    user.pronouns = remainingPrefix;
-    user.username = interaction.member.user.username;
-    user.avatarUrl = interaction.member.user.avatar;
-
-    await dataSource.getRepository(ServerMember).save(user);
-
-    console.log(user);
   }
 
   @OnButton("add")
@@ -236,6 +201,7 @@ export class Pronouns {
     const pronouns = Object.values(primary).concat(...other);
     if (!/^[0-9]+$/.test(roleId))
       roleId = pronouns.find(it => it.name === this.prefix(roleId)).id;
+    let added: Role;
     for (const role of pronouns) {
       const has = roles.has(role.id);
       const match = role.id === roleId;
@@ -243,8 +209,11 @@ export class Pronouns {
         await member.roles.remove(role);
         if (has && other.find(it => it.id === role.id))
           await member.guild.roles.delete(role);
-      } else if (match) await member.roles.add(role);
+      } else if (match) await member.roles.add((added = role));
     }
+    await withServerMember(member, user => {
+      user.pronouns = added && this.stripPrefix(added.name);
+    });
   }
 
   async primaryPronounButtons(guild: Guild) {

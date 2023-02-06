@@ -25,7 +25,7 @@ spec:
             - containerPort: 5324
           env:
             - name: POSTGRES_USER
-              valueForm:
+              valueFrom:
                 secretKeyRef:
                   name: vreiheit-postgres
                   key: username
@@ -42,7 +42,7 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: pgdatavol
-    volumes:
-      - name: pgdatavol
-        persistentVolumeClaim:
-          claimName: vreiheit-postgres-pvc
+      volumes:
+        - name: pgdatavol
+          hostPath:
+            path: /opt/vreiheit/data

@@ -20,23 +20,23 @@ spec:
       containers:
         - name: vreiheit-discord-bot
           image: ghcr.io/eyyy-nora/vreiheit-bot
-      env:
-        - name: POSTGRES_USER
-          valueForm:
-            secretKeyRef:
-              name: vreiheit-postgres
-              key: username
-        - name: POSTGRES_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: vreiheit-postgres
-              key: password
-        - name: POSTGRES_DB
-          valueFrom:
-            secretKeyRef:
-              name: vreiheit-postgres
-              key: db
-        - name: POSTGRES_HOST
-          value: vreiheit-postgres-service
-        - name: POSTGRES_PORT
-          value: 5432
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: vreiheit-postgres
+                  key: username
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: vreiheit-postgres
+                  key: password
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: vreiheit-postgres
+                  key: db
+            - name: POSTGRES_HOST
+              value: vreiheit-postgres-service
+            - name: POSTGRES_PORT
+              value: "5432"
