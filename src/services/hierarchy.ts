@@ -3,6 +3,7 @@ import {
   CommandInteraction,
   Guild,
   GuildMember,
+  Role,
   SlashCommandBuilder,
 } from "discord.js";
 import { ensureCommand } from "src/commands/ensure-command";
@@ -25,6 +26,8 @@ import {
 
 @Handler("hierarchy")
 export class HierarchyService {
+  hierarchies: Record<string, Role[]> = {};
+
   @OnInit()
   async onInit(client: Client<true>) {
     await ensureCommand(
@@ -57,6 +60,52 @@ export class HierarchyService {
           builder.setName("role").setRequired(true).setDescription("Role"),
         ),
     );
+    await ensureCommand(
+      client,
+      new SlashCommandBuilder()
+        .setDMPermission(false)
+        .setName("set-hierarchy")
+        .setDescription("Setzt die Rank-Abfolge fest")
+        .addRoleOption(builder =>
+          builder.setName("top1").setRequired(true).setDescription("Oberste"),
+        )
+        .addRoleOption(builder =>
+          builder.setName("top2").setRequired(false).setDescription("Zweite"),
+        )
+        .addRoleOption(builder =>
+          builder.setName("top3").setRequired(false).setDescription("Dritte"),
+        )
+        .addRoleOption(builder =>
+          builder.setName("top4").setRequired(false).setDescription("Vierte"),
+        )
+        .addRoleOption(builder =>
+          builder.setName("top5").setRequired(false).setDescription("Fünfte"),
+        )
+        .addRoleOption(builder =>
+          builder.setName("top6").setRequired(false).setDescription("Sechste"),
+        )
+        .addRoleOption(builder =>
+          builder.setName("top7").setRequired(false).setDescription("Siebte"),
+        )
+        .addRoleOption(builder =>
+          builder.setName("top8").setRequired(false).setDescription("Achte"),
+        )
+        .addRoleOption(builder =>
+          builder.setName("top9").setRequired(false).setDescription("Neunte"),
+        )
+        .addRoleOption(builder =>
+          builder.setName("top10").setRequired(false).setDescription("Zehnte"),
+        ),
+    );
+
+    for (const guild of client.guilds.cache.values()) {
+      const server = await getServer(guild.id);
+      this.hierarchies[guild.id] = (
+        await Promise.all(
+          server.hierarchy?.split(";").map(id => guild.roles.fetch(id)) ?? [],
+        )
+      ).filter(it => it);
+    }
 
     await this.everyTenMinutes(client);
     setInterval(this.everyTenMinutes.bind(this, client), 600000);
@@ -121,6 +170,23 @@ export class HierarchyService {
     });
   }
 
+  @OnCommand("set-hierarchy")
+  async onSetHierarchy(command: CommandInteraction) {
+    if (!command.memberPermissions.has("Administrator")) return;
+    await command.deferReply();
+    await command.deleteReply();
+    const roles = Array.from(
+      { length: 10 },
+      (_, i) => command.options.get(`top${10 - i}`, i === 9)?.role,
+    )
+      .filter(it => it)
+      .reverse();
+    await withServer(command.guildId, server => {
+      server.hierarchy = roles.map(it => it.id).join(";");
+      this.hierarchies[command.guildId] = roles as Role[];
+    });
+  }
+
   @OnMemberJoin()
   async onMemberJoin(member: GuildMember) {
     if (member.user.bot) {
@@ -162,5 +228,36 @@ export class HierarchyService {
   async speakerRole(guild: Guild) {
     const id = (await getServer(guild.id)).speakerRoleId;
     return id && guild.roles.fetch(id);
+  }
+
+  getHierarchy(guild: Guild) {
+    return this.hierarchies[guild.id] ?? [];
+  }
+
+  async isAbove(member: GuildMember, other: GuildMember, by = 1) {
+    const hierarchy = this.getHierarchy(member.guild);
+    const memberRole = await this.getHierarchyRole(member);
+    const otherRole = await this.getHierarchyRole(other);
+    return (
+      hierarchy.findIndex(({ id }) => memberRole.id === id) >
+      hierarchy.findIndex(({ id }) => otherRole.id === id) + by
+    );
+  }
+
+  async isBelow(member: GuildMember, other: GuildMember, by = 1) {
+    const hierarchy = this.getHierarchy(member.guild);
+    const memberRole = await this.getHierarchyRole(member);
+    const otherRole = await this.getHierarchyRole(other);
+    return (
+      hierarchy.findIndex(({ id }) => memberRole.id === id) <
+      hierarchy.findIndex(({ id }) => otherRole.id === id) - by
+    );
+  }
+
+  async getHierarchyRole(member: GuildMember) {
+    await member.fetch();
+    return this.getHierarchy(member.guild).find(it =>
+      member.roles.cache.has(it.id),
+    );
   }
 }
