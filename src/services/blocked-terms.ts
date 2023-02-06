@@ -216,7 +216,7 @@ export class BlockedTermsService {
       }
     }
     await modLog(forms.guild, {
-      content: `${forms.user.tag} setzte benutzerdefinierte Pronomen: "${name}"`,
+      content: `${forms.user} setzte benutzerdefinierte Pronomen: "${name}"`,
       components: [
         new ActionRowBuilder<ButtonBuilder>().addComponents(
           new ButtonBuilder()

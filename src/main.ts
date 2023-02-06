@@ -33,8 +33,27 @@ export async function initialise() {
       activities: [
         {
           type: ActivityType.Watching,
-          name: "Derkarldent auf Twitch zu",
-          url: "https://www.twitch.tv/dekarldent",
+          name: "vegane Kochvideos",
+        },
+        {
+          type: ActivityType.Competing,
+          name: "mit den Besten",
+        },
+        {
+          type: ActivityType.Playing,
+          name: "Faschos wie eine Geige",
+        },
+        {
+          type: ActivityType.Streaming,
+          name: "vegane Debatten",
+        },
+        {
+          type: ActivityType.Listening,
+          name: "vegane Talks",
+        },
+        {
+          type: ActivityType.Watching,
+          name: "Dokumentationen",
         },
       ],
       duration: 120,
