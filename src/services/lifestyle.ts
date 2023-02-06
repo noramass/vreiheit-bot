@@ -139,7 +139,7 @@ export class LifestyleService {
     if (roles.cache.has(newComer.id)) await roles.remove(newComer);
     return await this.tempReply(
       interaction,
-      `Lifestyle auf ${on.name} gesetzt!`,
+      `Deine Lebenseinstellung ist auf ${on.name} gesetzt!`,
     );
   }
 
