@@ -39,6 +39,9 @@ export class Server {
   botRoleId?: string;
 
   @Column("varchar", { nullable: true })
+  speakerRoleId?: string;
+
+  @Column("varchar", { nullable: true })
   rules?: string;
 
   @CreateDateColumn()

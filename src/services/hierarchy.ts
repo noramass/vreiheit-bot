@@ -14,6 +14,8 @@ import {
   OnMemberLeave,
   OnMemberUpdate,
 } from "src/decorators";
+import { ServerMember } from "src/entities/server-member";
+import { dataSource } from "src/init/data-source";
 import {
   getServer,
   getServerMember,
@@ -45,6 +47,45 @@ export class HierarchyService {
           builder.setName("role").setRequired(true).setDescription("Role"),
         ),
     );
+    await ensureCommand(
+      client,
+      new SlashCommandBuilder()
+        .setDMPermission(false)
+        .setName("set-speaker-role")
+        .setDescription("Setzt die Rolle für Menschen, die sprechen dürfen")
+        .addRoleOption(builder =>
+          builder.setName("role").setRequired(true).setDescription("Role"),
+        ),
+    );
+
+    await this.everyTenMinutes(client);
+    setInterval(this.everyTenMinutes.bind(this, client), 600000);
+  }
+
+  async everyTenMinutes(client: Client<true>) {
+    for (const guild of client.guilds.cache.values()) {
+      const speakerRole = await this.speakerRole(guild);
+      if (!speakerRole) continue;
+      const users = await dataSource
+        .getRepository(ServerMember)
+        .createQueryBuilder("member")
+        .leftJoinAndSelect("member.guild", "server")
+        .where(
+          `member.createdAt < :date AND server.discordId = :serverId AND member.maySpeak = FALSE AND member.leftAt = NULL`,
+          {
+            date: new Date(new Date().getDate() - 86400000), // 48h
+            serverId: guild.id,
+          },
+        )
+        .getMany();
+      for (const user of users) {
+        const member = await guild.members.fetch(user.discordId);
+        await member.roles.add(speakerRole);
+        user.maySpeak = true;
+      }
+      if (users.length)
+        await dataSource.getRepository(ServerMember).save(users);
+    }
   }
 
   @OnCommand("set-newcomer-role")
@@ -55,6 +96,17 @@ export class HierarchyService {
     const { role } = command.options.get("role", true);
     await withServer(command.guildId, server => {
       server.newComerRoleId = role.id;
+    });
+  }
+
+  @OnCommand("set-speaker-role")
+  async onSetSpeakerRole(command: CommandInteraction) {
+    if (!command.memberPermissions.has("Administrator")) return;
+    await command.deferReply();
+    await command.deleteReply();
+    const { role } = command.options.get("role", true);
+    await withServer(command.guildId, server => {
+      server.speakerRoleId = role.id;
     });
   }
 
@@ -104,6 +156,11 @@ export class HierarchyService {
 
   async botRole(guild: Guild) {
     const id = (await getServer(guild.id)).botRoleId;
+    return id && guild.roles.fetch(id);
+  }
+
+  async speakerRole(guild: Guild) {
+    const id = (await getServer(guild.id)).speakerRoleId;
     return id && guild.roles.fetch(id);
   }
 }
