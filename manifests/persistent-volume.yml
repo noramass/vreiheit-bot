@@ -5,9 +5,9 @@ metadata:
   labels:
     app: vreiheit
     ver: postgres-pv
-  spec:
-    capacity:
-      storage: 10Gi
-    accessModes:
-      - ReadWriteMany
-    persistentVolumeReclaimPolicy: Retain
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
