@@ -5,7 +5,6 @@ import { dataSource } from "src/init/data-source";
 import { client, generateInvite, withClient } from "src/init/discord";
 import { cyclePresence } from "src/presence/cycle-presence";
 import { cyclicIterator } from "src/util";
-import "./commands";
 import "./services";
 export async function initialise() {
   await dataSource.initialize();

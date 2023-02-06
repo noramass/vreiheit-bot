@@ -1,2 +1,1 @@
-import "./hierarchy";
-import "./rules";
+import "./ensure-command";

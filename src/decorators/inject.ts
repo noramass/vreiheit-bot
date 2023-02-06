@@ -1,7 +1,7 @@
 import { Constructor } from "src/decorators/meta";
 
 const registeredServices = new Map<Constructor, any>();
-export function InjectService(cls: () => Constructor) {
+export function InjectService(cls: () => any) {
   return function (proto, key: string | symbol) {
     Object.defineProperty(proto, key, {
       get() {

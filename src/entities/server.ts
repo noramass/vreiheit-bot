@@ -42,6 +42,15 @@ export class Server {
   speakerRoleId?: string;
 
   @Column("varchar", { nullable: true })
+  veganRoleId?: string;
+
+  @Column("varchar", { nullable: true })
+  notVeganRoleId?: string;
+
+  @Column("varchar", { nullable: true })
+  hierarchy?: string;
+
+  @Column("varchar", { nullable: true })
   rules?: string;
 
   @CreateDateColumn()
