@@ -17,6 +17,7 @@ export async function ensureCommand(
     const name = (command as BaseApplicationCommandData).name;
     const commands = await guild.commands.fetch();
     const match = commands.find(it => it.name === name);
+    if (match) return;
     if (match) await guild.commands.delete(match);
     await guild.commands.create(command);
   }

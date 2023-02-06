@@ -1,6 +1,7 @@
 import { ActionRowBuilder, ActivityType, ButtonBuilder, ButtonStyle } from "discord.js";
 import { registeredHandlers } from "src/decorators/handler";
 import { Server } from "src/entities/server";
+import { ServerMember } from "./entities/server-member";
 import { dataSource } from "src/init/data-source";
 import { client, generateInvite, withClient } from "src/init/discord";
 import { cyclePresence } from "src/presence/cycle-presence";
@@ -11,6 +12,7 @@ import "./commands";
 import { modLog } from "./logging/mod-log";
 import { findChannel } from "./messages";
 import "./services";
+import { addMemberEntry, setMemberLeft } from "./members/member-entries";
 export async function initialise() {
   await dataSource.initialize();
   const client = await withClient();
@@ -130,6 +132,8 @@ client.on("guildMemberRemove", async member => {
     await handler(member as any);
 
   // await removeCustomPronounRole(member as any);
+  if(member.user.bot) return;
+  await setMemberLeft(member);
 });
 
 client.on("guildMemberAdd", async member => {
@@ -146,6 +150,7 @@ client.on("guildMemberAdd", async member => {
     if (!role) await member.roles.add(hierarchy[0]);
     console.log(member.user.username, "ist dem server beigetreten");
     // TODO: welcome messages
+    await addMemberEntry(member);
   }
 });
 

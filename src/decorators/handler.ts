@@ -1,4 +1,5 @@
 import { Interaction } from "discord.js";
+import { registerService } from "src/decorators/inject";
 import {
   DiscordHandlerMeta,
   getMeta,
@@ -27,6 +28,7 @@ export function Handler(prefix: string = "") {
     const meta = getMeta(cls);
     meta.prefix = prefix;
     const instance = new (cls as any)();
+    registerService(cls, instance);
     const handlerMap = createHandlers(instance, meta);
     for (const [key, handlers] of Object.entries(handlerMap)) {
       const registered = registeredHandlers[key];

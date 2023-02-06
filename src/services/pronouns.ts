@@ -6,7 +6,6 @@ import {
   Client,
   CommandInteraction,
   ComponentType,
-  EmbedBuilder,
   Guild,
   GuildMember,
   ModalBuilder,
@@ -25,10 +24,12 @@ import {
   OnInit,
   OnMemberLeave,
 } from "src/decorators";
-import { modLog } from "src/logging/mod-log";
+import { Server } from "src/entities/server";
+import { ServerMember } from "src/entities/server-member";
 import { ensureRolesExist } from "src/roles/ensure-roles-exist";
 import { getRolesMatching } from "src/roles/get-roles-matching";
 import { rolesByName } from "src/roles/role-by-name";
+import { dataSource } from "src/init/data-source";
 import { chunks, createInverseLookup } from "src/util";
 
 @Handler("pronouns")
@@ -109,6 +110,39 @@ export class Pronouns {
       interaction.member as GuildMember,
       remainingPrefix,
     );
+
+    const server = await dataSource.getRepository(Server).findOne({
+      where: {
+        discordId: interaction.guild.id,
+      },
+    });
+
+    let user = await dataSource
+      .getRepository(ServerMember)
+      .createQueryBuilder("members")
+      .leftJoinAndSelect("members.guild", "server")
+      .where("members.discordId = :userId AND server.discordId = :serverId", {
+        userId: interaction.user.id,
+        serverId: interaction.guild.id,
+      })
+      .getOne();
+    if (user == null) {
+      user = new ServerMember();
+      user.discordId = interaction.member.user.id;
+      user.createdAt = new Date();
+      user.discriminator = ""; // @todo keine ahnung was hier rein muss
+      user.pronouns = remainingPrefix;
+      user.username = interaction.member.user.username;
+      user.avatarUrl = interaction.member.user.avatar;
+      user.guild = server;
+    }
+    user.pronouns = remainingPrefix;
+    user.username = interaction.member.user.username;
+    user.avatarUrl = interaction.member.user.avatar;
+
+    await dataSource.getRepository(ServerMember).save(user);
+
+    console.log(user);
   }
 
   @OnButton("add")
