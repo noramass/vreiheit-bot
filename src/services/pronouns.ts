@@ -323,4 +323,10 @@ export class Pronouns {
       ? name.slice(this.prefix().length)
       : name;
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public hasPronouns(member: GuildMember): boolean {
+    //TODO: Implement method
+    return true; //hardcoded true for testing purposes
+  }
 }
