@@ -70,7 +70,8 @@ export class BlockedTermsService {
             .setRequired(false),
         ),
     );
-    await ensureCommand(client, guild =>
+    await ensureCommand(
+      client,
       new SlashCommandBuilder()
         .setName("delete-blocked-term")
         .setDMPermission(false)
@@ -79,13 +80,7 @@ export class BlockedTermsService {
           builder
             .setName("pattern")
             .setRequired(true)
-            .setDescription("Das zu entfernende Blockpattern")
-            .addChoices(
-              ...(this.blockedTermsMap[guild.id] ?? []).map(term => ({
-                name: term.pattern.source,
-                value: term.id.toString(),
-              })),
-            ),
+            .setDescription("Das zu entfernende Blockpattern"),
         ),
     );
   }
@@ -238,7 +233,7 @@ export class BlockedTermsService {
             .setStyle(ButtonStyle.Danger),
           new ButtonBuilder()
             .setLabel("Okay!")
-            .setCustomId("messages:delete")
+            .setCustomId("messages:delete:::1")
             .setStyle(ButtonStyle.Success),
         ),
       ],

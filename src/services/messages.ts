@@ -8,8 +8,9 @@ export class Messages {
     interaction: Interaction,
     channelId: string,
     messageId: string,
+    force?: string,
   ) {
-    if (!interaction.memberPermissions.has("ManageMessages"))
+    if (!force && !interaction.memberPermissions.has("ManageMessages"))
       return this.reply(
         interaction,
         "Du kannst keine Nachrichten verwalten...",

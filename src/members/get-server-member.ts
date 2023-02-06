@@ -5,15 +5,10 @@ import { dataSource } from "src/init/data-source";
 import { PromiseOr } from "src/util";
 
 export async function getServerMember(member: GuildMember, save = true) {
-  let user = await dataSource
-    .getRepository(ServerMember)
-    .createQueryBuilder("members")
-    .leftJoinAndSelect("members.guild", "server")
-    .where("members.discordId = :userId AND server.discordId = :serverId", {
-      userId: member.user.id,
-      serverId: member.guild.id,
-    })
-    .getOne();
+  let user = await dataSource.getRepository(ServerMember).findOne({
+    where: { discordId: member.user.id, guild: { discordId: member.guild.id } },
+    relations: ["guild"],
+  });
   if (user == null) {
     user = new ServerMember();
     user.discordId = member.user.id;
@@ -22,7 +17,7 @@ export async function getServerMember(member: GuildMember, save = true) {
   user.username = member.user.username;
   user.discriminator = member.user.discriminator;
   user.avatarUrl = member.displayAvatarURL();
-  await dataSource.getRepository(ServerMember).save(user);
+  if (save) await dataSource.getRepository(ServerMember).save(user);
   return user;
 }
 
