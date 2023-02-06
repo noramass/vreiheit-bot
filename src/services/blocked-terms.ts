@@ -19,7 +19,7 @@ import {
   OnCommand,
   OnFormSubmit,
   OnInit,
-  OnMessage,
+  OnMessageCreate,
 } from "src/decorators";
 import { BlockedTerm } from "src/entities/blocked-term";
 import { Server } from "src/entities/server";
@@ -160,7 +160,7 @@ export class BlockedTermsService {
     });
   }
 
-  @OnMessage()
+  @OnMessageCreate()
   async onMessage(message: Message) {
     if (!message.member || message.member.user.bot) return;
     for (const term of this.getBlockedTerms(message.guildId, "chat")) {
