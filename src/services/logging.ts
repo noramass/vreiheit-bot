@@ -3,9 +3,9 @@ import {
   AuditLogEvent,
   ButtonBuilder,
   ButtonStyle,
-  CommandInteractionOptionResolver,
   GuildAuditLogsEntry,
   GuildBan,
+  GuildMember,
   Message,
   Role,
 } from "discord.js";
@@ -14,6 +14,7 @@ import {
   InjectService,
   OnBanCreate,
   OnBanDelete,
+  OnMemberUpdate,
   OnMessageDelete,
   OnMessageUpdate,
   OnRoleCreate,
@@ -28,6 +29,20 @@ import { Pronouns } from "./pronouns";
 export class LoggingService {
   @InjectService(() => Pronouns)
   pronouns!: Pronouns;
+
+  @OnMemberUpdate()
+  async onMemberUpdate(oldMember: GuildMember, newMember: GuildMember) {
+    if (oldMember.nickname === newMember.nickname) return;
+    const fetchedLogs = await newMember.guild.fetchAuditLogs({
+      type: AuditLogEvent.MemberUpdate,
+      limit: 1,
+    });
+    const memberLog: GuildAuditLogsEntry = fetchedLogs.entries.first();
+    await modLog(newMember.guild, {
+      content: `Der Nickname von **${oldMember.user.username}#${memberLog.executor.discriminator}** wurde von **${memberLog.executor.username}#${memberLog.executor.discriminator}** zu **${newMember.displayName}** geändert`,
+      components: [],
+    });
+  }
 
   @OnRoleCreate()
   async onRoleCreate(role: Role) {
