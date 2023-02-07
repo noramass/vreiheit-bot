@@ -15,14 +15,14 @@ export async function ensureCommand(
   for (const guild of client.guilds.cache.values()) {
     if (typeof command === "function") command = await command(guild);
     const name = (command as BaseApplicationCommandData).name;
-    //Check if in cache
-    let commands = await guild.commands.cache;
-    const cacheMatch = commands.find(it => it.name === name);
-    if (cacheMatch) return;
-    //Check again for fetch
-    commands = await guild.commands.fetch();
-    const fetchMatch = commands.find(it => it.name === name);
-    if (fetchMatch) return;
+
+    let hasCommand =
+      (await guild.commands.cache).find(it => it.name === name) != null;
+    if (!hasCommand)
+      hasCommand =
+        (await guild.commands.fetch()).find(it => it.name === name) != null;
+
+    if (hasCommand) return;
     //Command does not exist in cache nor in fetch. create it
     await guild.commands.create(command);
   }
