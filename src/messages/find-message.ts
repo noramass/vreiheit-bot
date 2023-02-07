@@ -10,5 +10,7 @@ export async function findMessage(
     typeof channel === "string"
       ? await findTextChannel(guild, channel)
       : channel;
-  return channel.messages.fetch(messageId);
+  return channel.messages.cache.has(messageId)
+    ? channel.messages.cache.get(messageId)
+    : channel.messages.fetch(messageId);
 }
