@@ -33,7 +33,7 @@ export async function initialise() {
       activities: [
         {
           type: ActivityType.Watching,
-          name: "Derkarldent auf Twitch zu",
+          name: "Dekarldent auf Twitch zu",
           url: "https://www.twitch.tv/dekarldent",
         },
       ],
