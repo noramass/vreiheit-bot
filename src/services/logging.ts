@@ -118,14 +118,9 @@ export class LoggingService {
           .setFields({
             name: "Moderator*in",
             value: `${banLog.executor}`,
+            inline: true,
           }),
       ],
-
-      content: `**${ban.user.username}#${
-        ban.user.discriminator
-      }** wurde von **${banLog.executor.username}#${
-        banLog.executor.discriminator
-      }** gebannt: **${banLog.reason ?? "N/A"}**`,
       components: [],
     });
   }
@@ -149,6 +144,7 @@ export class LoggingService {
           .setFields({
             name: "Moderator*in",
             value: `${unbanLog.executor}`,
+            inline: true,
           }),
       ],
     });
@@ -178,6 +174,7 @@ export class LoggingService {
           .setFields({
             name: "Moderator*in",
             value: `${match.executor}`,
+            inline: true,
           }),
       ],
     });
@@ -209,7 +206,7 @@ export class LoggingService {
           `Nachricht gelöscht`,
           message,
           undefined,
-          deleter,
+          deleter.id === message.author.id ? undefined : deleter,
         ),
       ],
     });
@@ -257,10 +254,6 @@ export class LoggingService {
       (old?.cleanContent ?? message.cleanContent).replace(/[*\\_~|]+/g, ""),
     );
 
-    if (!by) by = message.author;
-
-    console.log(Object.keys(message));
-
     const fields = [
       {
         name: "Kanal",
@@ -275,12 +268,14 @@ export class LoggingService {
       {
         name: "Author",
         value: `${message.author}`,
+        inline: true,
       },
     ];
-    if (by)
+    if (by && by.id !== message.author.id)
       fields.push({
         name: "Moderator*in",
         value: `${by}`,
+        inline: true,
       });
 
     return new EmbedBuilder()
