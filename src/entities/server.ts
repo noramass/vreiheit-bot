@@ -56,6 +56,12 @@ export class Server {
   @Column("jsonb", { default: {} })
   pronouns!: Record<string, string> & { other: string[] };
 
+  @Column("varchar", { nullable: true })
+  rulesChannelId?: string;
+
+  @Column("varchar", { nullable: true })
+  rulesChannel?: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 

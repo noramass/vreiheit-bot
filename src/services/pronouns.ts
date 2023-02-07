@@ -90,11 +90,6 @@ export class Pronouns {
             role.name,
           );
         }
-      console.log(
-        this.pronounCache[guild.id],
-        this.pronounNames[guild.id],
-        this.otherPronounCache[guild.id],
-      );
     }
   }
 
