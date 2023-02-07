@@ -9,6 +9,7 @@ import {
 import { ensureCommand } from "src/commands/ensure-command";
 import {
   Handler,
+  InjectService,
   OnCommand,
   OnInit,
   OnMemberJoin,
@@ -23,10 +24,20 @@ import {
   withServer,
   withServerMember,
 } from "src/members/get-server-member";
+import { sendDm } from "src/messages";
+import { I18nService } from "src/services/i18n";
+import { sleep } from "src/util";
+import { getSingleCached } from "src/util/caches";
+import { createPagingQuery } from "src/util/repos";
+import { FindManyOptions, IsNull, LessThan } from "typeorm";
 
 @Handler("hierarchy")
 export class HierarchyService {
-  hierarchies: Record<string, Role[]> = {};
+  hierarchies: Record<string, string[]> = {};
+  rulesChannel: Record<string, string> = {};
+
+  @InjectService(() => I18nService)
+  i18n!: I18nService;
 
   @OnInit()
   async onInit(client: Client<true>) {
@@ -58,6 +69,19 @@ export class HierarchyService {
         .setDescription("Setzt die Rolle für Menschen, die sprechen dürfen")
         .addRoleOption(builder =>
           builder.setName("role").setRequired(true).setDescription("Role"),
+        ),
+    );
+    await ensureCommand(
+      client,
+      new SlashCommandBuilder()
+        .setDMPermission(false)
+        .setName("set-rules-channel")
+        .setDescription("Legt den Regeln-Kanal fest.")
+        .addChannelOption(builder =>
+          builder
+            .setName("channel")
+            .setRequired(true)
+            .setDescription("Regeln-Kanal"),
         ),
     );
     await ensureCommand(
@@ -97,43 +121,58 @@ export class HierarchyService {
           builder.setName("top10").setRequired(false).setDescription("Zehnte"),
         ),
     );
-
-    for (const guild of client.guilds.cache.values()) {
-      const server = await getServer(guild.id);
-      this.hierarchies[guild.id] = (
-        await Promise.all(
-          server.hierarchy?.split(";").map(id => guild.roles.cache.has(id) ? guild.roles.cache.get(id) : guild.roles.fetch(id)) ?? [],
-        )
-      ).filter(it => it);
-    }
+    for (const guild of client.guilds.cache.values())
+      await this.initData(guild);
 
     await this.everyTenMinutes(client);
-    setInterval(this.everyTenMinutes.bind(this, client), 600000);
+    setInterval(this.everyTenMinutes.bind(this, client), 3600000);
   }
 
   async everyTenMinutes(client: Client<true>) {
+    const twoDaysPast = new Date(+new Date() - 86400000);
     for (const guild of client.guilds.cache.values()) {
       const speakerRole = await this.speakerRole(guild);
-      if (!speakerRole) continue;
-      const users = await dataSource
-        .getRepository(ServerMember)
-        .createQueryBuilder("member")
-        .leftJoinAndSelect("member.guild", "server")
-        .where(
-          `member.createdAt < :date AND server.discordId = :serverId AND member.maySpeak = FALSE AND member.leftAt = NULL`,
-          {
-            date: new Date(new Date().getDate() - 86400000), // 48h
-            serverId: guild.id,
+      const newComerRole = await this.newComerRole(guild);
+      for await (const users of createPagingQuery(
+        ServerMember,
+        {
+          where: {
+            createdAt: LessThan(twoDaysPast),
+            leftAt: IsNull(),
+            guild: { discordId: guild.id },
           },
-        )
-        .getMany();
-      for (const user of users) {
-        const member = guild.members.cache.has(user.discordId) ? guild.members.cache.get(user.discordId)  : await guild.members.fetch(user.discordId);
-        await member.roles.add(speakerRole);
-        user.maySpeak = true;
+          relations: ["guild"],
+        },
+        10,
+      )) {
+        for (const user of users) {
+          const member = await getSingleCached(guild.members, user.discordId);
+          if (
+            !user.pronouns ||
+            !user.hierarchyRole ||
+            user.hierarchyRole === newComerRole ||
+            !user.rulesAccepted ||
+            user.username === "nora"
+          ) {
+            if (user.reminded) return;
+            await sendDm(member, {
+              content: this.i18n.getDict("guild.join.reminder", {
+                user: member,
+                channel: this.rulesChannel[guild.id] ?? "regeln",
+              }),
+            });
+            user.reminded = true;
+            continue;
+          }
+          if (speakerRole && !user.maySpeak) {
+            await member.roles.add(speakerRole);
+            user.maySpeak = true;
+          }
+        }
+        if (users.length)
+          await dataSource.getRepository(ServerMember).save(users);
+        await sleep(60000);
       }
-      if (users.length)
-        await dataSource.getRepository(ServerMember).save(users);
     }
   }
 
@@ -170,6 +209,18 @@ export class HierarchyService {
     });
   }
 
+  @OnCommand("set-rules-channel")
+  async onSetRulesChannel(command: CommandInteraction) {
+    if (!command.memberPermissions.has("Administrator")) return;
+    await command.deferReply();
+    await command.deleteReply();
+    const { channel } = command.options.get("channel", true);
+    await withServer(command.guildId, server => {
+      server.rulesChannelId = channel.id;
+      server.rulesChannel = channel.name;
+    });
+  }
+
   @OnCommand("set-hierarchy")
   async onSetHierarchy(command: CommandInteraction) {
     if (!command.memberPermissions.has("Administrator")) return;
@@ -182,8 +233,9 @@ export class HierarchyService {
       .filter(it => it)
       .reverse();
     await withServer(command.guildId, server => {
-      server.hierarchy = roles.map(it => it.id).join(";");
-      this.hierarchies[command.guildId] = roles as Role[];
+      server.hierarchy = (this.hierarchies[command.guildId] = roles.map(
+        it => it.id,
+      )).join(";");
     });
   }
 
@@ -231,30 +283,31 @@ export class HierarchyService {
     return this.hierarchies[guild.id] ?? [];
   }
 
+  async initData(guild: Guild) {
+    const server = await getServer(guild.id);
+    this.hierarchies[guild.id] =
+      server.hierarchy?.split(";")?.filter(it => it) ?? [];
+    this.rulesChannel[guild.id] = server.rulesChannel;
+  }
+
   async isAbove(member: GuildMember, other: GuildMember, by = 1) {
     const hierarchy = this.getHierarchy(member.guild);
     const memberRole = await this.getHierarchyRole(member);
     const otherRole = await this.getHierarchyRole(other);
-    return (
-      hierarchy.findIndex(({ id }) => memberRole.id === id) >
-      hierarchy.findIndex(({ id }) => otherRole.id === id) + by
-    );
+    return hierarchy.indexOf(memberRole) > hierarchy.indexOf(otherRole) + by;
   }
 
   async isBelow(member: GuildMember, other: GuildMember, by = 1) {
     const hierarchy = this.getHierarchy(member.guild);
     const memberRole = await this.getHierarchyRole(member);
     const otherRole = await this.getHierarchyRole(other);
-    return (
-      hierarchy.findIndex(({ id }) => memberRole.id === id) <
-      hierarchy.findIndex(({ id }) => otherRole.id === id) - by
-    );
+    return hierarchy.indexOf(memberRole) < hierarchy.indexOf(otherRole) - by;
   }
 
   async getHierarchyRole(member: GuildMember) {
     await member.fetch();
     return this.getHierarchy(member.guild).find(it =>
-      member.roles.cache.has(it.id),
+      member.roles.cache.has(it),
     );
   }
 }

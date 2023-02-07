@@ -47,6 +47,9 @@ export class ServerMember {
   @Column("boolean", { default: false })
   maySpeak!: boolean;
 
+  @Column("boolean", { default: false })
+  reminded!: boolean;
+
   @Column("timestamp", { nullable: true })
   leftAt?: Date | null;
 
