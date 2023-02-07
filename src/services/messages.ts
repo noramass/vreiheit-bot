@@ -19,10 +19,15 @@ export class Messages {
     let message = interaction.isMessageComponent() && interaction.message;
     if (channelId && messageId) {
       const channel = await interaction.guild.channels.fetch(channelId);
-      message =
-        channel &&
-        channel.isTextBased() &&
-        (await channel.messages.fetch(messageId));
+      try {
+        message =
+          channel &&
+          channel.isTextBased() &&
+          (await channel.messages.fetch(messageId));
+      } catch (e) {
+        if (interaction.isMessageComponent() && interaction.message)
+          return await interaction.message.edit({ components: [] });
+      }
     }
     if (message) await message.delete();
   }

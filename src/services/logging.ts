@@ -3,17 +3,20 @@ import {
   AuditLogEvent,
   ButtonBuilder,
   ButtonStyle,
+  EmbedBuilder,
   GuildAuditLogsEntry,
   GuildBan,
   GuildMember,
   Message,
   Role,
+  User,
 } from "discord.js";
 import {
   Handler,
   InjectService,
   OnBanCreate,
   OnBanDelete,
+  OnMemberLeave,
   OnMemberUpdate,
   OnMessageDelete,
   OnMessageUpdate,
@@ -22,8 +25,8 @@ import {
   OnRoleUpdate,
 } from "src/decorators";
 import { modLog } from "src/logging/mod-log";
-import { findChannel } from "src/messages";
 import { Pronouns } from "./pronouns";
+import * as Diff from "diff";
 
 @Handler()
 export class LoggingService {
@@ -35,11 +38,13 @@ export class LoggingService {
     if (oldMember.nickname === newMember.nickname) return;
     const fetchedLogs = await newMember.guild.fetchAuditLogs({
       type: AuditLogEvent.MemberUpdate,
-      limit: 1,
+      limit: 5,
     });
-    const memberLog: GuildAuditLogsEntry = fetchedLogs.entries.first();
+    const memberLog: GuildAuditLogsEntry = fetchedLogs.entries.find(
+      log => log.executor.id === newMember.id,
+    );
     await modLog(newMember.guild, {
-      content: `Der Nickname von **${oldMember.user.username}#${memberLog.executor.discriminator}** wurde von **${memberLog.executor.username}#${memberLog.executor.discriminator}** zu **${newMember.displayName}** geändert`,
+      content: `Der Nickname von ${newMember} wurde von **${memberLog.executor.username}#${memberLog.executor.discriminator}** zu **${newMember.displayName}** geändert`,
       components: [],
     });
   }
@@ -53,7 +58,7 @@ export class LoggingService {
     });
     const roleLog: GuildAuditLogsEntry = fetchedLogs.entries.first();
     await modLog(role.guild, {
-      content: `Die Rolle **${role.name}** wurde von **${roleLog.executor.username}#${roleLog.executor.discriminator}** erstellt`,
+      content: `Die Rolle ${role} wurde von ${roleLog.executor} erstellt`,
       components: [],
     });
   }
@@ -69,12 +74,12 @@ export class LoggingService {
     const roleLog: GuildAuditLogsEntry = fetchedLogs.entries.first();
     if (oldRole.name === newRole.name) {
       await modLog(newRole.guild, {
-        content: `Die Rolle **${oldRole.name}** wurde von **${roleLog.executor.username}#${roleLog.executor.discriminator}** verändert`,
+        content: `Die Rolle ${oldRole} wurde von ${roleLog.executor} verändert`,
         components: [],
       });
     } else {
       await modLog(newRole.guild, {
-        content: `Die Rolle **${oldRole.name}** wurde von **${roleLog.executor.username}#${roleLog.executor.discriminator}** zu **${newRole.name}** geändert`,
+        content: `Die Rolle **@${oldRole.name}** wurde von ${roleLog.executor} zu ${newRole} geändert`,
         components: [],
       });
     }
@@ -89,7 +94,7 @@ export class LoggingService {
     });
     const roleLog: GuildAuditLogsEntry = fetchedLogs.entries.first();
     await modLog(role.guild, {
-      content: `Die Rolle **${role.name}** wurde von **${roleLog.executor.username}#${roleLog.executor.discriminator}** gelöscht`,
+      content: `Die Rolle **@${role.name}** wurde von ${roleLog.executor} gelöscht`,
       components: [],
     });
   }
@@ -102,6 +107,20 @@ export class LoggingService {
     });
     const banLog: GuildAuditLogsEntry = fetchedLogs.entries.first();
     await modLog(ban.guild, {
+      embeds: [
+        new EmbedBuilder()
+          .setTitle(`User ${ban.user.tag} wurde verbannt`)
+          .setDescription(ban.reason ?? null)
+          .setAuthor({
+            name: ban.user.tag,
+            iconURL: ban.user.displayAvatarURL(),
+          })
+          .setFields({
+            name: "Moderator*in",
+            value: `${banLog.executor}`,
+          }),
+      ],
+
       content: `**${ban.user.username}#${
         ban.user.discriminator
       }** wurde von **${banLog.executor.username}#${
@@ -119,62 +138,160 @@ export class LoggingService {
     });
     const unbanLog: GuildAuditLogsEntry = fetchedLogs.entries.first();
     await modLog(unban.guild, {
-      content: `**${unban.user.username}#${unban.user.discriminator}** wurde von **${unbanLog.executor.username}#${unbanLog.executor.discriminator}** entbannt`,
-      components: [],
+      embeds: [
+        new EmbedBuilder()
+          .setTitle(`User ${unban.user.tag} wurde entbannt`)
+          .setDescription(unban.reason ?? null)
+          .setAuthor({
+            name: unban.user.tag,
+            iconURL: unban.user.displayAvatarURL(),
+          })
+          .setFields({
+            name: "Moderator*in",
+            value: `${unbanLog.executor}`,
+          }),
+      ],
     });
   }
 
-  //   @OnMessageCreate()
-  //   async onMessageCreate(message: Message) {
-  //     if (!message.author.bot) {
-  //       let channel = await findChannel(message.guild, message.channelId);
-  //       await modLog(message.guild, {
-  //         content: `In **${channel.name}** schrieb **${message.author.username}#${message.author.discriminator}**: "${message.content}"`,
-  //         components: [this.buildUserActionRow(message)],
-  //       });
-  //     }
-  //   }
+  @OnMemberLeave()
+  async onMemberLeave(member: GuildMember) {
+    const now = Date.now();
+    const logs = await member.guild.fetchAuditLogs({
+      type: AuditLogEvent.MemberKick,
+      limit: 5,
+    });
+    const matches = logs.entries
+      .reverse()
+      .filter(it => it.target.id === member.id);
+    const match = matches.find(it => +it.createdAt >= now - 5000);
+    if (!match || match.executor.bot) return;
+    await modLog(member.guild, {
+      embeds: [
+        new EmbedBuilder()
+          .setTitle(`Mitglied ${member.user.tag} wurde gekickt`)
+          .setDescription(match.reason ?? null)
+          .setAuthor({
+            name: match.target.tag,
+            iconURL: match.target.displayAvatarURL(),
+          })
+          .setFields({
+            name: "Moderator*in",
+            value: `${match.executor}`,
+          }),
+      ],
+    });
+  }
 
   @OnMessageUpdate()
   async onMessageUpdate(oldMessage: Message, newMessage: Message) {
-    if (!newMessage.author.bot) {
-      let channel = await findChannel(newMessage.guild, newMessage.channelId);
-      await modLog(newMessage.guild, {
-        content: `In **${channel.name}** überarbeitete **${newMessage.author.username}#${newMessage.author.discriminator}**: "${oldMessage.content}" zu "${newMessage.content}"`,
-        components: [this.buildUserActionRow(newMessage)],
-      });
-    }
+    if (newMessage.author.bot) return;
+    await modLog(newMessage.guild, {
+      embeds: [
+        this.buildMessageEmbed(`Nachricht bearbeitet`, newMessage, oldMessage),
+      ],
+      components: [this.buildMessageActionRow(newMessage)],
+    });
   }
 
   @OnMessageDelete()
   async onMessageDelete(message: Message) {
-    if (!message.author.bot) {
-      let channel = await findChannel(message.guild, message.channelId);
-      await modLog(
-        message.guild,
-        `In **${channel.name}** wurde Nachricht von **${message.author.username}#${message.author.discriminator}** gelöscht: "${message.content}"`,
-      );
-    }
+    if (message.author.bot) return;
+    const logs = await message.guild.fetchAuditLogs({
+      limit: 1,
+      type: AuditLogEvent.MessageDelete,
+    });
+    const deleter = logs.entries.first().executor;
+    if (deleter?.bot) return;
+    await modLog(message.guild, {
+      embeds: [
+        this.buildMessageEmbed(
+          `Nachricht gelöscht`,
+          message,
+          undefined,
+          deleter,
+        ),
+      ],
+    });
   }
 
-  buildUserActionRow(
-    message: Message,
-    reason: string = "Unangebrachte Nachricht",
-  ) {
+  buildMessageActionRow(message: Message) {
     return new ActionRowBuilder<ButtonBuilder>().setComponents(
       new ButtonBuilder()
         .setLabel("Löschen")
         .setCustomId(`messages:delete:${message.channelId}:${message.id}`)
         .setStyle(ButtonStyle.Danger),
-      new ButtonBuilder()
-        .setStyle(ButtonStyle.Danger)
-        .setCustomId(`members:kick:${message.author.id}:${reason}`)
-        .setLabel("Kicken"),
-      new ButtonBuilder()
-        .setStyle(ButtonStyle.Danger)
-        .setCustomId(`members:ban:${message.author.id}:${reason}`)
-        .setLabel("Bannen"),
     );
+  }
+
+  buildDiff(a: string, b: string) {
+    if (a.toLowerCase() === b.toLowerCase()) return a;
+    const patches = Diff.diffWords(a, b, { ignoreCase: true });
+    const parts: { added?: string; removed?: string; value?: string }[] = [];
+    let lastRemoved = false,
+      lastAdded = false;
+    for (const part of patches) {
+      if (part.added) {
+        if (lastRemoved) parts[parts.length - 1].added = part.value;
+        else parts.push({ added: part.value });
+      } else if (part.removed) {
+        if (lastAdded) parts[parts.length - 1].removed = part.value;
+        else parts.push({ removed: part.value });
+      } else parts.push({ value: part.value });
+      lastRemoved = part.removed;
+      lastAdded = part.added;
+    }
+    return parts
+      .map(({ added, removed, value }) => {
+        if (added && removed) return `[~~${added}~~ -> **${removed}**]`;
+        if (added) return `[**${added}**]`;
+        if (removed) return `[**${removed}**]`;
+        return value;
+      })
+      .join("");
+  }
+
+  buildMessageEmbed(title: string, message: Message, old?: Message, by?: User) {
+    const content = this.buildDiff(
+      message.cleanContent.replace(/[*\\_~|]+/g, ""),
+      (old?.cleanContent ?? message.cleanContent).replace(/[*\\_~|]+/g, ""),
+    );
+
+    if (!by) by = message.author;
+
+    console.log(Object.keys(message));
+
+    const fields = [
+      {
+        name: "Kanal",
+        value: `${message.channel}`,
+        inline: true,
+      },
+      {
+        name: "Nachricht",
+        value: `[link](${message.url})`,
+        inline: true,
+      },
+      {
+        name: "Author",
+        value: `${message.author}`,
+      },
+    ];
+    if (by)
+      fields.push({
+        name: "Moderator*in",
+        value: `${by}`,
+      });
+
+    return new EmbedBuilder()
+      .setTitle(title)
+      .setURL(message.url)
+      .setAuthor({
+        name: message.author.tag,
+        iconURL: message.author.displayAvatarURL(),
+      })
+      .setFields(fields)
+      .setDescription(content);
   }
 
   isPronounRole(role: Role) {
