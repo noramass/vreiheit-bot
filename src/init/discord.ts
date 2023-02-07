@@ -14,6 +14,7 @@ export const client = new Client({
     "GuildIntegrations",
     "GuildMembers",
     "GuildMessages",
+    "GuildBans",
     // "GuildMessageReactions",
     // "GuildModeration",
     // "GuildEmojisAndStickers",
