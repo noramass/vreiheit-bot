@@ -46,6 +46,7 @@ export class LoggingService {
   @OnRoleUpdate()
   async onRoleUpdate(oldRole: Role, newRole: Role) {
     if (this.isPronounRole(oldRole)) return;
+    if (oldRole.rawPosition !== newRole.rawPosition) return;
     const fetchedLogs = await newRole.guild.fetchAuditLogs({
       type: AuditLogEvent.RoleUpdate,
       limit: 1,
