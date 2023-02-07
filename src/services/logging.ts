@@ -3,6 +3,7 @@ import {
   AuditLogEvent,
   ButtonBuilder,
   ButtonStyle,
+  CommandInteractionOptionResolver,
   GuildAuditLogsEntry,
   GuildBan,
   Message,
@@ -10,6 +11,7 @@ import {
 } from "discord.js";
 import {
   Handler,
+  InjectService,
   OnBanCreate,
   OnBanDelete,
   OnMessageDelete,
@@ -20,11 +22,16 @@ import {
 } from "src/decorators";
 import { modLog } from "src/logging/mod-log";
 import { findChannel } from "src/messages";
+import { Pronouns } from "./pronouns";
 
 @Handler()
 export class LoggingService {
+  @InjectService(() => Pronouns)
+  pronouns!: Pronouns;
+
   @OnRoleCreate()
   async onRoleCreate(role: Role) {
+    if (this.isPronounRole(role)) return;
     const fetchedLogs = await role.guild.fetchAuditLogs({
       type: AuditLogEvent.RoleCreate,
       limit: 1,
@@ -38,6 +45,7 @@ export class LoggingService {
 
   @OnRoleUpdate()
   async onRoleUpdate(oldRole: Role, newRole: Role) {
+    if (this.isPronounRole(oldRole)) return;
     const fetchedLogs = await newRole.guild.fetchAuditLogs({
       type: AuditLogEvent.RoleUpdate,
       limit: 1,
@@ -58,6 +66,7 @@ export class LoggingService {
 
   @OnRoleDelete()
   async onRoleDelete(role: Role) {
+    if (this.isPronounRole(role)) return;
     const fetchedLogs = await role.guild.fetchAuditLogs({
       type: AuditLogEvent.RoleDelete,
       limit: 1,
@@ -150,5 +159,9 @@ export class LoggingService {
         .setCustomId(`members:ban:${message.author.id}:${reason}`)
         .setLabel("Bannen"),
     );
+  }
+
+  isPronounRole(role: Role) {
+    return role.name.startsWith(this.pronouns.prefix());
   }
 }
