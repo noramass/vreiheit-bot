@@ -7,7 +7,6 @@ import {
   CommandInteraction,
   EmbedBuilder,
   Guild,
-  GuildMember,
   ModalBuilder,
   ModalSubmitInteraction,
   SlashCommandBuilder,
@@ -22,7 +21,7 @@ import {
   OnFormSubmit,
   OnInit,
 } from "src/decorators";
-import { Poll, withPoll } from "src/entities/poll";
+import { Poll } from "src/entities/poll";
 import { dataSource, withResource } from "src/init/data-source";
 import { getServer } from "src/members/get-server-member";
 import { editMessage } from "src/messages";
@@ -52,6 +51,10 @@ export class PollingService {
             .setDescription("Zeitspanne")
             .setRequired(false)
             .addChoices(
+              {
+                name: "10 Sekunden",
+                value: 0.161616,
+              },
               {
                 name: "5 Minuten",
                 value: 5,
@@ -241,7 +244,11 @@ export class PollingService {
     const polls = this.polls[guild.id];
     polls.splice(polls.indexOf(poll), 1);
     poll.closed = true;
-    for (const [choice] of Object.values(poll.counts)) poll.results[choice]++;
+    for (const choice of Object.values(poll.counts)) {
+      if (poll.results[choice] == null) poll.results[choice] = 1;
+      else poll.results[choice]++;
+    }
+    await dataSource.getRepository(Poll).save(poll);
     const results = Object.entries(poll.results).sort(([, a], [, b]) => b - a);
 
     await editMessage(guild, poll.channelId, poll.messageId, {
