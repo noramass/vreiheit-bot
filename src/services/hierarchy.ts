@@ -147,14 +147,14 @@ export class HierarchyService {
       )) {
         for (const user of users) {
           const member = await getSingleCached(guild.members, user.discordId);
+          if (!member) continue;
           if (
             !user.pronouns ||
             !user.hierarchyRole ||
             user.hierarchyRole === newComerRole ||
-            !user.rulesAccepted ||
-            user.username === "nora"
+            !user.rulesAccepted
           ) {
-            if (user.reminded) return;
+            if (user.reminded) continue;
             await sendDm(member, {
               content: this.i18n.getDict("guild.join.reminder", {
                 user: member,
