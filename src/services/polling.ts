@@ -121,7 +121,7 @@ export class PollingService {
   async onCreatePoll(interaction: CommandInteraction) {
     const channel =
       interaction.options.get("channel")?.channel ?? interaction.channel;
-    const timeframe = interaction.options.get("interval", false)?.value ?? 10;
+    const timeframe = interaction.options.get("timeframe", false)?.value ?? 10;
     await interaction.showModal(
       new ModalBuilder()
         .setTitle("Umfrageoptionen")
