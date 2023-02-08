@@ -7,6 +7,11 @@ export async function getSingleCached<K, T, R>(
 ): Promise<T> {
   if (manager.cache.has(key)) return manager.cache.get(key);
   if (many) await (manager as any).fetch();
-  else return (manager as any).fetch(key);
+  else
+    try {
+      return (manager as any).fetch(key);
+    } catch {
+      return undefined as T;
+    }
   return manager.cache.get(key);
 }
