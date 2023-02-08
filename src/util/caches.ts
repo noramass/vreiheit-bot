@@ -9,7 +9,7 @@ export async function getSingleCached<K, T, R>(
   if (many) await (manager as any).fetch();
   else
     try {
-      return (manager as any).fetch(key);
+      return await (manager as any).fetch(key);
     } catch {
       return undefined as T;
     }
