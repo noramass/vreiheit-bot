@@ -124,8 +124,8 @@ export class HierarchyService {
     for (const guild of client.guilds.cache.values())
       await this.initData(guild);
 
-    await this.everyTenMinutes(client);
-    setInterval(this.everyTenMinutes.bind(this, client), 3600000);
+    // await this.everyTenMinutes(client);
+    // setInterval(this.everyTenMinutes.bind(this, client), 3600000);
   }
 
   async everyTenMinutes(client: Client<true>) {
