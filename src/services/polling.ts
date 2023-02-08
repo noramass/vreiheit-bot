@@ -169,10 +169,14 @@ export class PollingService {
     const poll = new Poll();
     poll.conclusion = conclusion;
     poll.guild = await getServer(form.guildId);
-    poll.options = form.fields
-      .getTextInputValue("options")
-      .split(/[\r\n]+/g)
-      .filter(it => it);
+    poll.options = [
+      ...new Set(
+        form.fields
+          .getTextInputValue("options")
+          .split(/[\r\n]+/g)
+          .filter(it => it),
+      ),
+    ];
     poll.description = form.fields.getTextInputValue("description");
     poll.title = form.fields.getTextInputValue("title");
     poll.channelId = channelId;
