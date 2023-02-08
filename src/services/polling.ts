@@ -207,7 +207,10 @@ export class PollingService {
     await btn.deferUpdate();
     await withResource(Poll, { id: pollId }, poll => {
       if (poll.closed) return;
-      poll.counts[btn.user.id] = option.replaceAll("🤡", ":");
+      poll.counts = {
+        ...poll.counts,
+        [btn.user.id]: option.replaceAll("🤡", ":"),
+      };
     });
   }
 
