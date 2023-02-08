@@ -1,4 +1,5 @@
 import { BlockedTerm } from "src/entities/blocked-term";
+import { Poll } from "src/entities/poll";
 import { ServerMember } from "src/entities/server-member";
 import {
   Column,
@@ -73,4 +74,7 @@ export class Server {
 
   @OneToMany(() => ServerMember, ({ guild }) => guild)
   members!: ServerMember[];
+
+  @OneToMany(() => Poll, ({ guild }) => guild)
+  polls!: Poll[];
 }

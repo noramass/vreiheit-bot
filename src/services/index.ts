@@ -8,3 +8,4 @@ export * from "./hierarchy";
 export * from "./logging";
 export * from "./lifestyle";
 export * from "./global-slowmode";
+export * from "./polling";
