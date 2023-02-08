@@ -147,7 +147,10 @@ export class HierarchyService {
       )) {
         for (const user of users) {
           const member = await getSingleCached(guild.members, user.discordId);
-          if (!member) continue;
+          if (!member) {
+            user.leftAt = new Date();
+            continue;
+          }
           if (
             !user.pronouns ||
             !user.hierarchyRole ||
@@ -155,12 +158,12 @@ export class HierarchyService {
             !user.rulesAccepted
           ) {
             if (user.reminded) continue;
-            await sendDm(member, {
+            /*await sendDm(member, {
               content: this.i18n.getDict("guild.join.reminder", {
                 user: member,
                 channel: this.rulesChannel[guild.id] ?? "regeln",
               }),
-            });
+            });*/
             user.reminded = true;
             continue;
           }
