@@ -17,6 +17,7 @@ import {
 import { ensureCommand } from "src/commands/ensure-command";
 import {
   Handler,
+  InjectService,
   OnButton,
   OnCommand,
   OnFormSubmit,
@@ -25,6 +26,7 @@ import {
 } from "src/decorators";
 import { withServerMember } from "src/members/get-server-member";
 import { ensureRolesExist } from "src/roles/ensure-roles-exist";
+import { I18nService } from "src/services/i18n";
 import { chunks, createInverseLookup } from "src/util";
 
 @Handler("pronouns")
@@ -73,6 +75,9 @@ export class Pronouns {
   otherPronounCache: Record<string, string[]> = {};
   pronounNames: Record<string, Record<string, string>> = {};
 
+  @InjectService(() => I18nService)
+  i18n!: I18nService;
+
   @OnInit()
   async onInit(client: Client<true>) {
     await ensureCommand(
@@ -111,7 +116,7 @@ export class Pronouns {
     }
 
     await interaction.channel.send({
-      content: "Wähle deine Pronomen",
+      content: this.i18n.get("guild.pronouns"),
       components: await this.primaryPronounButtons(interaction.guild),
     });
   }
