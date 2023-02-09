@@ -55,6 +55,10 @@ export class Pronouns {
       name: this.prefix("He/She/They"),
       color: "#fdba74",
     },
+    "any": {
+      name: this.prefix("Any"),
+      color: "#71cb9f",
+    },
     "ask": {
       name: this.prefix("Nachfragen"),
       color: "#86efac",
