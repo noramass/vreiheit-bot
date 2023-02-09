@@ -22,7 +22,7 @@ import {
   OnInit,
 } from "src/decorators";
 import { Poll } from "src/entities/poll";
-import { dataSource, withResource } from "src/init/data-source";
+import { dataSource } from "src/init/data-source";
 import { getServer } from "src/members/get-server-member";
 import { editMessage } from "src/messages";
 import { chunks } from "src/util";
