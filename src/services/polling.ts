@@ -205,13 +205,18 @@ export class PollingService {
   @OnButton("select")
   async onPollSelect(btn: ButtonInteraction, pollId: string, option: string) {
     await btn.deferUpdate();
-    await withResource(Poll, { id: pollId }, poll => {
-      if (poll.closed) return;
-      poll.counts = {
-        ...poll.counts,
-        [btn.user.id]: option.replaceAll("🤡", ":"),
-      };
-    });
+    await dataSource
+      .createQueryBuilder()
+      .update(Poll)
+      .set({
+        counts: () =>
+          `jsonb_set(counts,'{${btn.user.id}}', '${JSON.stringify(option)
+            .replaceAll("🤡", ":")
+            .replaceAll("'", "''")}')`,
+      })
+      .where("id = :pollId", { pollId })
+      .execute();
+    console.log(await dataSource.getRepository(Poll).find());
   }
 
   buildOptionButtons(poll: Poll): ActionRowBuilder<ButtonBuilder>[] {
