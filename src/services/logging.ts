@@ -54,9 +54,10 @@ export class LoggingService {
     if (this.isPronounRole(role)) return;
     const fetchedLogs = await role.guild.fetchAuditLogs({
       type: AuditLogEvent.RoleCreate,
-      limit: 1,
+      limit: 5,
     });
-    const roleLog: GuildAuditLogsEntry = fetchedLogs.entries.first();
+    const roleLog = fetchedLogs.entries.find(it => it.target.id === role.id);
+    if (roleLog?.executor?.bot || !roleLog) return;
     await modLog(role.guild, {
       content: `Die Rolle ${role} wurde von ${roleLog.executor} erstellt`,
       components: [],
@@ -69,9 +70,10 @@ export class LoggingService {
     if (oldRole.rawPosition !== newRole.rawPosition) return;
     const fetchedLogs = await newRole.guild.fetchAuditLogs({
       type: AuditLogEvent.RoleUpdate,
-      limit: 1,
+      limit: 5,
     });
-    const roleLog: GuildAuditLogsEntry = fetchedLogs.entries.first();
+    const roleLog = fetchedLogs.entries.find(it => it.target.id === newRole.id);
+    if (roleLog?.executor?.bot || !roleLog) return;
     if (oldRole.name === newRole.name) {
       await modLog(newRole.guild, {
         content: `Die Rolle ${oldRole} wurde von ${roleLog.executor} verändert`,
@@ -90,9 +92,10 @@ export class LoggingService {
     if (this.isPronounRole(role)) return;
     const fetchedLogs = await role.guild.fetchAuditLogs({
       type: AuditLogEvent.RoleDelete,
-      limit: 1,
+      limit: 5,
     });
-    const roleLog: GuildAuditLogsEntry = fetchedLogs.entries.first();
+    const roleLog = fetchedLogs.entries.find(it => it.target.id === role.id);
+    if (roleLog?.executor?.bot || !roleLog) return;
     await modLog(role.guild, {
       content: `Die Rolle **@${role.name}** wurde von ${roleLog.executor} gelöscht`,
       components: [],
@@ -103,9 +106,10 @@ export class LoggingService {
   async onBanCreate(ban: GuildBan) {
     const fetchedLogs = await ban.guild.fetchAuditLogs({
       type: AuditLogEvent.MemberBanAdd,
-      limit: 1,
+      limit: 5,
     });
-    const banLog: GuildAuditLogsEntry = fetchedLogs.entries.first();
+    const match = fetchedLogs.entries.find(it => it.target.id === ban.user.id);
+    if (match?.executor?.bot || !match) return;
     await modLog(ban.guild, {
       embeds: [
         new EmbedBuilder()
@@ -117,7 +121,7 @@ export class LoggingService {
           })
           .setFields({
             name: "Moderator*in",
-            value: `${banLog.executor}`,
+            value: `${match.executor}`,
             inline: true,
           }),
       ],
@@ -129,9 +133,12 @@ export class LoggingService {
   async onBanDelete(unban: GuildBan) {
     const fetchedLogs = await unban.guild.fetchAuditLogs({
       type: AuditLogEvent.MemberBanRemove,
-      limit: 1,
+      limit: 5,
     });
-    const unbanLog: GuildAuditLogsEntry = fetchedLogs.entries.first();
+    const match = fetchedLogs.entries.find(
+      it => it.target.id === unban.user.id,
+    );
+    if (match?.executor?.bot || !match) return;
     await modLog(unban.guild, {
       embeds: [
         new EmbedBuilder()
@@ -143,7 +150,7 @@ export class LoggingService {
           })
           .setFields({
             name: "Moderator*in",
-            value: `${unbanLog.executor}`,
+            value: `${match.executor}`,
             inline: true,
           }),
       ],
@@ -195,18 +202,18 @@ export class LoggingService {
   async onMessageDelete(message: Message) {
     if (message.author.bot) return;
     const logs = await message.guild.fetchAuditLogs({
-      limit: 1,
+      limit: 5,
       type: AuditLogEvent.MessageDelete,
     });
-    const deleter = logs.entries.first().executor;
-    if (deleter?.bot) return;
+    const match = logs.entries.find(it => it.target.id === message.id);
+    if (match?.executor?.bot || !match) return;
     await modLog(message.guild, {
       embeds: [
         this.buildMessageEmbed(
           `Nachricht gelöscht`,
           message,
           undefined,
-          deleter.id === message.author.id ? undefined : deleter,
+          match.executor.id === message.author.id ? undefined : match.executor,
         ),
       ],
     });
