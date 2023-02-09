@@ -235,7 +235,7 @@ export class PollingService {
     return `${date.getHours()}:${date
       .getMinutes()
       .toString()
-      .padStart(2, "0")} - ${date.getDay()}.${date
+      .padStart(2, "0")} - ${date.getDate()}.${date
       .getMonth()
       .toString()
       .padStart(2, "0")}.${date.getFullYear()}`;
