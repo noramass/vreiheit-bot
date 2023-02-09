@@ -22,7 +22,7 @@ import {
   OnInit,
 } from "src/decorators";
 import { Poll } from "src/entities/poll";
-import { dataSource } from "src/init/data-source";
+import { dataSource, withResource } from "src/init/data-source";
 import { getServer } from "src/members/get-server-member";
 import { editMessage } from "src/messages";
 import { chunks } from "src/util";
@@ -182,10 +182,9 @@ export class PollingService {
     poll.channelId = channelId;
     poll.counts = {};
     poll.results = Object.fromEntries(poll.options.map(opt => [opt, 0]));
-    await dataSource.getRepository(Poll).save(poll);
     const channel = await getSingleCached(form.guild.channels, channelId);
     if (!channel.isTextBased()) return;
-    const { id } = await channel.send({
+    const message = await channel.send({
       embeds: [
         new EmbedBuilder()
           .setTitle(`Umfrage: ${poll.title}`)
@@ -194,11 +193,13 @@ export class PollingService {
             text: `Offen bis ${this.formatDate(poll.conclusion)}`,
           }),
       ],
+    });
+    poll.messageId = message.id;
+    await dataSource.getRepository(Poll).save(poll);
+    await message.edit({
       components: this.buildOptionButtons(poll),
     });
-    poll.messageId = id;
     this.polls[form.guildId].push(poll);
-    await dataSource.getRepository(Poll).save(poll);
     this.schedulePolls(form.guild, poll);
   }
 
@@ -216,7 +217,9 @@ export class PollingService {
       })
       .where("id = :pollId", { pollId })
       .execute();
-    console.log(await dataSource.getRepository(Poll).find());
+    console.log(
+      await dataSource.getRepository(Poll).find({ where: { id: pollId } }),
+    );
   }
 
   buildOptionButtons(poll: Poll): ActionRowBuilder<ButtonBuilder>[] {
@@ -235,8 +238,7 @@ export class PollingService {
     return `${date.getHours()}:${date
       .getMinutes()
       .toString()
-      .padStart(2, "0")} - ${date.getDate()}.${date
-      .getMonth()
+      .padStart(2, "0")} - ${date.getDate()}.${(date.getMonth() + 1)
       .toString()
       .padStart(2, "0")}.${date.getFullYear()}`;
   }
