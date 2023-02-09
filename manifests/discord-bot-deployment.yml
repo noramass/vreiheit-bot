@@ -40,3 +40,5 @@ spec:
               value: vreiheit-postgres-service
             - name: POSTGRES_PORT
               value: "5432"
+            - name: TZ
+              value: "Europe/Berlin"
