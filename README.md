@@ -23,6 +23,9 @@ git config --global user.name "Dein Github Name Hier"
 git config --global user.email "Deine Github Email Hier"
 ```
 
+Docker muss installiert sein und docker-compose muss zur Verfügung stehen, um lokal die Datenbank starten zu können.
+Folge hierzu den Anweisung spezifisch für dein Betriebssystem.
+
 Zum Entwickeln empfehle ich dir eine Entwicklungsumgebung wie Webstorm, VSCode, etc.
 
 ### Installation
@@ -32,6 +35,11 @@ pnpm i
 ```
 Darauf hin muss eine `.env.local` Datei angelegt werden, in der die Discord Bot und Application Daten eingetragen
 werden. Hierfür kannst du einfach die .env Datei kopieren und dann mit deinen eigenen Daten bestücken.
+
+Um die Datenbank zu starten, führe folgenden Befehl im Projekt-Verzeichnis aus:
+```shell
+docker compose up -d
+```
 
 Zum Starten des Bots kannst du folgendes Kommando verwenden:
 ```shell
@@ -47,3 +55,4 @@ Um deinen Code auf Formatierungsfehler zu prüfen:
 ```shell
 pnpm run lint
 ```
+
