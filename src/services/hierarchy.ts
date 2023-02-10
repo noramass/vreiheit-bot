@@ -220,7 +220,6 @@ export class HierarchyService {
     const { channel } = command.options.get("channel", true);
     await withServer(command.guildId, server => {
       server.rulesChannelId = channel.id;
-      server.rulesChannel = channel.name;
     });
   }
 
