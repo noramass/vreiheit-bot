@@ -1,4 +1,4 @@
-import { dataSource } from "src/init/data-source";
+import { dataSource } from "src/database/data-source";
 import { EntityTarget, FindManyOptions } from "typeorm";
 
 export async function* createPagingQuery<T>(

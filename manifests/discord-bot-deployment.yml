@@ -20,6 +20,8 @@ spec:
       containers:
         - name: vreiheit-discord-bot
           image: ghcr.io/eyyy-nora/vreiheit-bot
+          ports:
+            - containerPort: 3000
           env:
             - name: POSTGRES_USER
               valueFrom:

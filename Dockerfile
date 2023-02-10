@@ -21,4 +21,4 @@ ENV POSTGRES_USER=${POSTGRES_USER}
 ENV POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 ENV POSTGRES_DB=${POSTGRES_DB}
 RUN pnpm run build
-CMD ["node", "dist/main.js"]
+CMD ["pnpm", "run", "start"]
