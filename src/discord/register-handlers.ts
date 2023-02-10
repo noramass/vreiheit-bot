@@ -1,7 +1,15 @@
+import { GuildMember } from "discord.js";
 import { dataSource } from "src/database/data-source";
 import { Server } from "src/database/entities/server";
+import { ServerMember } from "src/database/entities/server-member";
 import { registeredHandlers } from "src/discord/decorators";
 import { client } from "src/discord/init";
+import {
+  getServer,
+  getServerMember,
+} from "src/discord/members/get-server-member";
+import { sendDm } from "src/discord/messages";
+import { sleep } from "src/util";
 
 let lastProcessed: string;
 client.on("interactionCreate", async interaction => {
@@ -14,7 +22,10 @@ client.on("interactionCreate", async interaction => {
 client.on("ready", async client => {
   await client.guilds.fetch();
   for (const guild of client.guilds.cache.values()) {
+    await guild.fetch();
     const preview = await guild.fetchPreview();
+    for (const channel of guild.channels.cache.values())
+      if (channel.isTextBased()) await channel.messages.fetch();
     await dataSource.getRepository(Server).upsert(
       {
         discordId: guild.id,
@@ -27,6 +38,85 @@ client.on("ready", async client => {
     );
   }
   for (const handler of registeredHandlers.init) await handler(client);
+
+  for (const guild of client.guilds.cache.values()) {
+    await guild.fetch();
+    const server = await getServer(guild.id);
+
+    console.log("GUILD", guild.name, guild.approximateMemberCount);
+    const mapped = await Promise.all(
+      guild.members.cache
+        .filter(it => !it.user.bot)
+        .map(async member => {
+          const data = await getServerMember(member);
+          return {
+            member,
+            data,
+          };
+        }),
+    );
+
+    const toDm: { member: GuildMember; data: ServerMember }[] = [];
+    const repo = dataSource.getRepository(ServerMember);
+
+    for (const { member, data } of mapped) {
+      if (!data.hierarchyRole) {
+        if (!member.roles.highest) {
+          await member.roles.add(server.newComerRoleId);
+          data.hierarchyRole = server.newComerRoleId;
+        } else data.hierarchyRole = member.roles.highest.id;
+      }
+
+      if (!data.rulesAccepted) {
+        if (
+          member.roles.cache.find(
+            it =>
+              it.id === server.veganRoleId || it.id === server.notVeganRoleId,
+          )
+        )
+          data.rulesAccepted = true;
+        else toDm.push({ member, data });
+      }
+
+      if (!data.pronouns) {
+        const match = member.roles.cache.find(it =>
+          it.name.startsWith("Pronomen: "),
+        );
+        if (match) data.pronouns = match.name.slice("Pronomen: ".length);
+        else toDm.push({ member, data });
+      }
+
+      await repo.save(data);
+    }
+
+    for (const { member, data } of toDm) {
+      if (data.reminded) continue;
+      data.reminded = true;
+
+      if (data.hierarchyRole !== server.newComerRoleId && !data.pronouns) {
+        await sendDm(member, {
+          content: `**Hey ${member}!**
+
+Vielen Dank, das du dem einfach-vegan Discord beigetreten bist!
+Ich habe mitbekommen, dass du deine Pronomen noch nicht festgelegt hast.
+Bitte erledige dies im channel 🎭︱infos-zu-rollen.
+
+Vielen Dank!`,
+        });
+        await sleep(5000);
+      } else if (data.hierarchyRole === server.newComerRoleId) {
+        await sendDm(member, {
+          content: `**Hey ${member}!**
+          
+Schön, dass du dich dazu entschieden hast dem einfach-vegan Discord zu joinen und ein Teil der Community zu sein. Es sollte ein großer Safespace für uns alle werden, weshalb wir dich darum bitten im Channel 🎭︱infos-zu-rollen die Regeln zu akzeptieren, sowie deine Pronomen und deinen derzeitigen Lebensstil festzulegen. Dann hast du nämlich auch automatisch Zugriff auf den vollen Umfang der Text- & Voicechannel.
+
+Dankeschön, dass du daran partizipierst diesen Planeten zu einem besseren Ort zu machen. 💚`,
+        });
+        await sleep(5000);
+      }
+      await repo.save(data);
+    }
+  }
 });
 
 client.on("guildMemberRemove", async member => {

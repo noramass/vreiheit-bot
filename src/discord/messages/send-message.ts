@@ -31,14 +31,18 @@ export async function editMessage(
   return message.edit(body);
 }
 
+const noop = () => {};
+
 export async function sendDm(
   member: GuildMember | User,
   body: string | MessagePayload | MessageCreateOptions,
 ) {
-  if (member.dmChannel) return member.dmChannel.send(body);
-  else {
-    await member.createDM();
-    member.dmChannel.send(body);
-    await member.deleteDM();
+  if (member.dmChannel) {
+    await member.dmChannel.send(body).catch(noop);
+    await member.deleteDM().catch(noop);
+  } else {
+    await member.createDM().catch(noop);
+    member.dmChannel.send(body).catch(noop);
+    await member.deleteDM().catch(noop);
   }
 }

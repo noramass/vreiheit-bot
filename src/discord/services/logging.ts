@@ -25,6 +25,7 @@ import {
   OnRoleUpdate,
 } from "src/discord/decorators";
 import { modLog } from "src/discord/logging/mod-log";
+import { sleep } from "src/util";
 import { Pronouns } from "./pronouns";
 import * as Diff from "diff";
 
@@ -190,6 +191,12 @@ export class LoggingService {
   @OnMessageUpdate()
   async onMessageUpdate(oldMessage: Message, newMessage: Message) {
     if (newMessage.author.bot) return;
+    if (
+      oldMessage.content.toLowerCase().trim() ===
+      newMessage.content.toLowerCase().trim()
+    )
+      return;
+
     await modLog(newMessage.guild, {
       embeds: [
         this.buildMessageEmbed(`Nachricht bearbeitet`, newMessage, oldMessage),
@@ -201,19 +208,28 @@ export class LoggingService {
   @OnMessageDelete()
   async onMessageDelete(message: Message) {
     if (message.author.bot) return;
+    await sleep(1000);
     const logs = await message.guild.fetchAuditLogs({
       limit: 5,
       type: AuditLogEvent.MessageDelete,
     });
-    const match = logs.entries.find(it => it.target.id === message.id);
-    if (match?.executor?.bot || !match) return;
+    const match = logs.entries
+      .reverse()
+      .find(
+        it =>
+          it.extra.channel.id === message.channelId &&
+          it.target.id === message.author.id,
+      );
+    if (match?.executor?.bot) return;
     await modLog(message.guild, {
       embeds: [
         this.buildMessageEmbed(
           `Nachricht gelöscht`,
           message,
           undefined,
-          match.executor.id === message.author.id ? undefined : match.executor,
+          !match || match.executor.id === message.author.id
+            ? undefined
+            : match.executor,
         ),
       ],
     });
