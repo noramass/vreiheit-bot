@@ -3,7 +3,6 @@ import {
   CommandInteraction,
   Guild,
   GuildMember,
-  Role,
   SlashCommandBuilder,
 } from "discord.js";
 import { ensureCommand } from "src/commands/ensure-command";
@@ -24,17 +23,15 @@ import {
   withServer,
   withServerMember,
 } from "src/members/get-server-member";
-import { sendDm } from "src/messages";
 import { I18nService } from "src/services/i18n";
 import { sleep } from "src/util";
 import { getSingleCached } from "src/util/caches";
 import { createPagingQuery } from "src/util/repos";
-import { FindManyOptions, IsNull, LessThan } from "typeorm";
+import { IsNull, LessThan } from "typeorm";
 
 @Handler("hierarchy")
 export class HierarchyService {
   hierarchies: Record<string, string[]> = {};
-  rulesChannel: Record<string, string> = {};
 
   @InjectService(() => I18nService)
   i18n!: I18nService;
@@ -289,7 +286,6 @@ export class HierarchyService {
     const server = await getServer(guild.id);
     this.hierarchies[guild.id] =
       server.hierarchy?.split(";")?.filter(it => it) ?? [];
-    this.rulesChannel[guild.id] = server.rulesChannel;
   }
 
   async isAbove(member: GuildMember, other: GuildMember, by = 1) {
