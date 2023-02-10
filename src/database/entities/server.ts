@@ -60,8 +60,14 @@ export class Server {
   @Column("varchar", { nullable: true })
   rulesChannelId?: string;
 
-  @Column("varchar", { nullable: true })
-  rulesChannel?: string;
+  @Column("varchar", {
+    transformer: {
+      to: value => (value ? value.join(";") : ""),
+      from: value => (value ? value.split(";") : []),
+    },
+    nullable: true,
+  })
+  rulesMessageIds!: string[];
 
   @CreateDateColumn()
   createdAt!: Date;

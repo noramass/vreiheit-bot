@@ -5,9 +5,11 @@ import {
   ButtonStyle,
   Client,
   CommandInteraction,
+  Guild,
   ModalBuilder,
   ModalSubmitInteraction,
   SlashCommandBuilder,
+  TextBasedChannel,
   TextInputBuilder,
   TextInputStyle,
 } from "discord.js";
@@ -19,11 +21,14 @@ import {
   OnFormSubmit,
   OnInit,
 } from "src/discord/decorators";
+import { Server } from "src/database/entities/server";
+import { withResource } from "src/database/data-source";
 import {
   getServer,
   withServer,
   withServerMember,
 } from "src/discord/members/get-server-member";
+import { editMessage } from "src/discord/messages";
 import { chunks } from "src/util";
 
 @Handler("rules")
@@ -69,6 +74,7 @@ export class RulesService {
     await withServer(form.guildId, server => {
       server.rules = fullText.trim();
     });
+    await this.editRulesMessages(form.guild);
   }
 
   @OnCommand("edit-rules")
@@ -100,11 +106,40 @@ export class RulesService {
     await interaction.deleteReply();
     let ruleTexts = await this.getRuleTexts(interaction.guildId);
     ruleTexts = ruleTexts.filter(it => it);
-    const last = ruleTexts.pop();
-    const channel = interaction.channel;
-    for (const text of ruleTexts) await channel.send({ content: text });
-    channel.send({
-      content: last,
+    await this.createRulesMessages(
+      interaction.channel,
+      interaction.guild,
+      ruleTexts,
+    );
+  }
+
+  async editRulesMessages(guild: Guild) {
+    const server = await getServer(guild.id);
+    const rules = await this.getRuleTexts(guild.id, false);
+    if (server.rulesMessageIds.length !== rules.length) {
+      console.error("rules message length mismatch");
+      // TODO: later ;)
+    } else {
+      for (let i = 0; i < rules.length; ++i) {
+        const messageId = server.rulesMessageIds[i];
+        await editMessage(guild, server.rulesChannelId, messageId, rules[i]);
+      }
+    }
+  }
+
+  async createRulesMessages(
+    channel: TextBasedChannel,
+    guild: Guild,
+    rules: string[],
+  ) {
+    const messageIds: string[] = [];
+
+    for (const text of rules) {
+      const message = await channel.send({ content: text });
+      messageIds.push(message.id);
+    }
+
+    await editMessage(guild, channel, messageIds[messageIds.length - 1], {
       components: [
         new ActionRowBuilder<ButtonBuilder>().addComponents(
           new ButtonBuilder()
@@ -114,11 +149,16 @@ export class RulesService {
         ),
       ],
     });
+
+    await withResource(Server, { discordId: guild.id }, server => {
+      server.rulesChannelId = channel.id;
+      server.rulesMessageIds = messageIds;
+    });
   }
 
-  async getRuleTexts(id: string): Promise<string[]> {
+  async getRuleTexts(id: string, fillEmpty = true): Promise<string[]> {
     const ruleTexts = chunks<string>((await getServer(id)).rules ?? "", 4000);
-    while (ruleTexts.length < 5) ruleTexts.push("");
+    if (fillEmpty) while (ruleTexts.length < 5) ruleTexts.push("");
     return ruleTexts;
   }
 }

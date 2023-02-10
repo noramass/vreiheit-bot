@@ -222,7 +222,7 @@ export class Pronouns {
   async togglePronounRole(member: GuildMember, roleId: string) {
     await member.fetch();
     const roles = member.roles.cache;
-    const { other, ...primary } = await this.getPronouns(member.guild);
+    const { other = [], ...primary } = await this.getPronouns(member.guild);
     const pronouns = Object.values(primary).concat(...other);
     let added: string;
     for (const role of pronouns as string[]) {
@@ -269,12 +269,12 @@ export class Pronouns {
   async getPronouns(guild: Guild) {
     return {
       ...this.pronounCache[guild.id],
-      other: this.otherPronounCache[guild.id],
+      other: this.otherPronounCache[guild.id] ?? [],
     };
   }
 
   async getCustomPronouns(guild: Guild) {
-    return this.otherPronounCache[guild.id];
+    return this.otherPronounCache[guild.id] ?? [];
   }
 
   async ensureRolesExist(guild: Guild) {
