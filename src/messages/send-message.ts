@@ -4,6 +4,7 @@ import {
   MessageCreateOptions,
   MessageEditOptions,
   MessagePayload,
+  TextBasedChannel,
   TextChannel,
   User,
 } from "discord.js";
@@ -12,7 +13,7 @@ import { findMessage } from "src/messages/find-message";
 
 export async function sendMessage(
   guild: Guild,
-  channel: TextChannel | string,
+  channel: TextBasedChannel | string,
   message: string | MessagePayload | MessageCreateOptions,
 ) {
   if (typeof channel === "string")
@@ -22,7 +23,7 @@ export async function sendMessage(
 
 export async function editMessage(
   guild: Guild,
-  channel: TextChannel | string,
+  channel: TextBasedChannel | string,
   messageId: string,
   body: string | MessageEditOptions | MessagePayload,
 ) {
