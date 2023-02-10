@@ -1,9 +1,9 @@
-import { Guild, TextChannel } from "discord.js";
+import { Guild, TextBasedChannel, TextChannel } from "discord.js";
 import { findTextChannel } from "src/messages/find-channel";
 
 export async function findMessage(
   guild: Guild,
-  channel: TextChannel | string,
+  channel: TextBasedChannel | string,
   messageId: string,
 ) {
   channel =
