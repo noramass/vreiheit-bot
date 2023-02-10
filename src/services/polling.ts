@@ -30,7 +30,6 @@ import { getSingleCached } from "src/util/caches";
 
 @Handler("poll")
 export class PollingService {
-  polls: Record<string, Poll[]> = {};
   @OnInit()
   async onInit(client: Client<true>) {
     await ensureCommand(
@@ -108,14 +107,12 @@ export class PollingService {
     );
 
     for (const guild of client.guilds.cache.values()) {
-      const polls = (this.polls[guild.id] = await dataSource
-        .getRepository(Poll)
-        .find({
-          where: {
-            closed: false,
-            guild: { discordId: guild.id },
-          },
-        }));
+      const polls = await dataSource.getRepository(Poll).find({
+        where: {
+          closed: false,
+          guild: { discordId: guild.id },
+        },
+      });
       this.schedulePolls(guild, ...polls);
     }
   }
@@ -199,7 +196,6 @@ export class PollingService {
     await message.edit({
       components: this.buildOptionButtons(poll),
     });
-    this.polls[form.guildId].push(poll);
     this.schedulePolls(form.guild, poll);
   }
 
@@ -245,42 +241,45 @@ export class PollingService {
 
   schedulePolls(guild: Guild, ...polls: Poll[]) {
     for (const poll of polls) {
-      if (poll.conclusion <= new Date()) this.concludePoll(guild, poll).then();
+      if (poll.conclusion <= new Date())
+        this.concludePoll(guild, poll.id).then();
       else
         setTimeout(
-          this.concludePoll.bind(this, guild, poll),
+          this.concludePoll.bind(this, guild, poll.id),
           +poll.conclusion - +new Date(),
         );
     }
   }
 
-  async concludePoll(guild: Guild, poll: Poll) {
-    const polls = this.polls[guild.id];
-    polls.splice(polls.indexOf(poll), 1);
-    poll.closed = true;
-    for (const choice of Object.values(poll.counts)) {
-      if (poll.results[choice] == null) poll.results[choice] = 1;
-      else poll.results[choice]++;
-    }
-    await dataSource.getRepository(Poll).save(poll);
-    const results = Object.entries(poll.results).sort(([, a], [, b]) => b - a);
+  async concludePoll(guild: Guild, pollId: string) {
+    await withResource(Poll, { id: pollId }, async poll => {
+      poll.closed = true;
+      for (const choice of Object.values(poll.counts)) {
+        if (poll.results[choice] == null) poll.results[choice] = 1;
+        else poll.results[choice]++;
+      }
+      await dataSource.getRepository(Poll).save(poll);
+      const results = Object.entries(poll.results).sort(
+        ([, a], [, b]) => b - a,
+      );
 
-    await editMessage(guild, poll.channelId, poll.messageId, {
-      embeds: [
-        new EmbedBuilder()
-          .setTitle(`Geschlossen: ${poll.title}`)
-          .setDescription(poll.description)
-          .setFields(
-            results.map(([title, value]) => ({
-              name: title,
-              value: value.toString(),
-            })),
-          )
-          .setFooter({
-            text: `Geschlossen am ${this.formatDate(poll.conclusion)}`,
-          }),
-      ],
-      components: [],
+      await editMessage(guild, poll.channelId, poll.messageId, {
+        embeds: [
+          new EmbedBuilder()
+            .setTitle(`Geschlossen: ${poll.title}`)
+            .setDescription(poll.description)
+            .setFields(
+              results.map(([title, value]) => ({
+                name: title,
+                value: value.toString(),
+              })),
+            )
+            .setFooter({
+              text: `Geschlossen am ${this.formatDate(poll.conclusion)}`,
+            }),
+        ],
+        components: [],
+      });
     });
   }
 }
