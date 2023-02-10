@@ -65,6 +65,7 @@ export class Server {
       to: value => (value ? value.join(";") : ""),
       from: value => (value ? value.split(";") : []),
     },
+    nullable: true,
   })
   rulesMessageIds!: string[];
 
