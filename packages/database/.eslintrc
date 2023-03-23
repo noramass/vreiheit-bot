@@ -1,0 +1,4 @@
+{
+  "extends": ["@vreiheit/eslint-config"],
+  "root": true
+}

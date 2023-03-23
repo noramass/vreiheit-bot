@@ -1,6 +1,8 @@
 /node_modules
 /dist
 /data
+**/node_modules
+**/dist
 
 .env.local
 .env.*.local

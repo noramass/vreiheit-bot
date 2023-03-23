@@ -11,16 +11,11 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "baseUrl": ".",
-    "paths": {
-      "src/*": ["src/*"]
-    },
     "jsx": "react",
   },
   "ts-node": {
     "esm": true,
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "**/node_modules"],
   "references": [{ "path":  "./tsconfig.node.json" }]
 }

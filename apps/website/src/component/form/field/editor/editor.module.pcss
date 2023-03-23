@@ -1,0 +1,21 @@
+
+
+
+.textEditor {
+  @apply h-8 px-4 py-1 align-middle relative;
+  &:focus-within {
+    .prefix, .suffix {
+      display: inline;
+    }
+  }
+}
+
+.input, .input:focus {
+  @apply bg-transparent outline-none border-none;
+}
+
+.prefix, .suffix {
+  @apply opacity-50;
+  display: none;
+  white-space: pre;
+}

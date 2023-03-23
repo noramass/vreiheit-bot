@@ -1,0 +1,7 @@
+.fieldLabel {
+  @apply text-base px-4;
+  &:global(.required):after {
+    @apply text-rose-500 font-bold;
+    content: '*'
+  }
+}

@@ -1,0 +1,20 @@
+
+.fieldContainer {
+  @apply py-0.5;
+}
+
+.fieldBase {
+  @apply h-12 overflow-visible bg-b-600 rounded;
+  transition: background-color .15s linear;
+  &:focus-within {
+    @apply bg-b-900;
+  }
+}
+
+.fieldEditor {
+  @apply min-h-12 overflow-visible rounded outline-none;
+  transition: outline-color .15s linear, outline-width .15s linear;
+  &:focus-within {
+    @apply outline-2 outline-a-300;
+  }
+}

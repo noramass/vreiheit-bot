@@ -1,0 +1,30 @@
+{
+  "name": "@vreiheit/server",
+  "version": "0.0.0",
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "start": "node dist/main.js",
+    "lint": "eslint --ext .ts,.tsx",
+    "lint:fix": "eslint --fix --ext .ts,.tsx"
+  },
+  "devDependencies": {
+    "@vreiheit/eslint-config": "workspace:^",
+    "@types/node": "^18.15.3",
+    "@types/express": "^4.17.17",
+    "tsup": "^6.6.3",
+    "typescript": "^5.0.2",
+    "tslib": "^2.5.0",
+    "eslint": "^8.36.0"
+  },
+  "dependencies": {
+    "@vreiheit/database": "workspace:^",
+    "@vreiheit/discord": "workspace:^",
+    "@vreiheit/util": "workspace:^",
+    "@vreiheit/website": "workspace:^",
+    "express": "^4.18.2",
+    "discord.js": "^14.8.0",
+    "pg": "^8.10.0",
+    "typeorm": "^0.3.12"
+  }
+}

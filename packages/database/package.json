@@ -1,0 +1,23 @@
+{
+  "name": "@vreiheit/database",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "scripts": {
+    "build": "tsup",
+    "lint": "eslint --ext .ts,.tsx .",
+    "lint:fix": "eslint --fix --ext .ts,.tsx ."
+  },
+  "dependencies": {
+    "@vreiheit/util": "workspace:^",
+    "typeorm": "^0.3.12",
+    "pg": "^8.10.0"
+  },
+  "devDependencies": {
+    "@vreiheit/eslint-config": "workspace:^",
+    "eslint": "^8.36.0",
+    "tslib": "^2.5.0",
+    "tsup": "^6.6.3",
+    "typescript": "^5.0.2"
+  }
+}

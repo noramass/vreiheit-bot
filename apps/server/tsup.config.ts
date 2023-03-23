@@ -1,5 +1,4 @@
 import { defineConfig } from "tsup";
-import eslint from "esbuild-plugin-eslint";
 
 export default defineConfig(({ watch }) => {
   return {
@@ -11,7 +10,7 @@ export default defineConfig(({ watch }) => {
     dts: !watch,
     format: ["cjs"],
     target: "node16",
-    outDir: "dist/server",
-    esbuildPlugins: [eslint()],
+    outDir: "dist",
+    esbuildPlugins: [],
   };
 });

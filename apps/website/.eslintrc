@@ -1,0 +1,7 @@
+{
+  "extends": ["@vreiheit/eslint-config"],
+  "root": true,
+  "rules": {
+    "no-console": "off"
+  }
+}
