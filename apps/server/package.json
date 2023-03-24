@@ -9,21 +9,22 @@
     "lint:fix": "eslint --fix --ext .ts,.tsx"
   },
   "devDependencies": {
-    "@vreiheit/eslint-config": "workspace:^",
-    "@types/node": "^18.15.3",
     "@types/express": "^4.17.17",
-    "tsup": "^6.6.3",
-    "typescript": "^5.0.2",
+    "@types/node": "^18.15.3",
+    "@vreiheit/eslint-config": "workspace:^",
+    "eslint": "^8.36.0",
     "tslib": "^2.5.0",
-    "eslint": "^8.36.0"
+    "tsup": "^6.6.3",
+    "typescript": "^5.0.2"
   },
   "dependencies": {
+    "@propero/easy-api": "^2.1.0",
     "@vreiheit/database": "workspace:^",
     "@vreiheit/discord": "workspace:^",
     "@vreiheit/util": "workspace:^",
     "@vreiheit/website": "workspace:^",
-    "express": "^4.18.2",
     "discord.js": "^14.8.0",
+    "express": "^4.18.2",
     "pg": "^8.10.0",
     "typeorm": "^0.3.12"
   }

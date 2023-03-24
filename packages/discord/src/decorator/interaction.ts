@@ -1,13 +1,21 @@
 import { PromiseOr } from "@vreiheit/util";
 import {
+  AutocompleteInteraction,
   BaseInteraction,
   ButtonInteraction,
   ChatInputCommandInteraction,
   CommandInteraction,
+  CommandInteractionOption,
   ContextMenuCommandInteraction,
   Interaction,
 } from "discord.js";
-import { DiscordMeta, getDiscordMeta, idMatches, remainingId } from "src/util";
+import {
+  DiscordMeta,
+  getDiscordMeta,
+  idMatches,
+  remainingId,
+  createLastFilter,
+} from "src/util";
 
 export function OnInteraction(interactionId?: string) {
   const next = createLastFilter();
@@ -89,13 +97,31 @@ export function OnModalSubmit(formId?: string) {
   });
 }
 
-function createLastFilter() {
-  let last: unknown = undefined;
-  return function next(it: unknown) {
-    if (last === it) return false;
-    last = it;
-    return true;
-  };
+export function OnAutocomplete(command: string, option?: string) {
+  const next = createLastFilter();
+  function findFocusedOptionRecursive(
+    options: ReadonlyArray<CommandInteractionOption>,
+  ) {
+    for (const option of options) {
+      if (option.options) return findFocusedOptionRecursive(option.options);
+      if (option.focused) return option;
+    }
+  }
+
+  return interactionDecorator<AutocompleteInteraction>(
+    interaction => {
+      if (!next(interaction.id)) return;
+      if (!interaction.isAutocomplete()) return;
+      if (interaction.commandName !== command) return false;
+      if (option)
+        return interaction.options.data.find(it => it.focused).name === option;
+      else return true;
+    },
+    interaction => [
+      findFocusedOptionRecursive(interaction.options.data),
+      interaction.options.getFocused(),
+    ],
+  );
 }
 
 function customIdMatches(
@@ -122,7 +148,7 @@ function interactionDecorator<T extends BaseInteraction = Interaction>(
 ) {
   return function (proto: any, name: string | symbol) {
     getDiscordMeta(proto.constructor).handlers.interaction.push(
-      async function ({ context, interaction, meta }) {
+      async function ({ context, params: [interaction], meta }) {
         if (!filter(interaction, context, meta)) return;
         const params =
           (await parameters?.(interaction as T, context, meta)) ?? [];

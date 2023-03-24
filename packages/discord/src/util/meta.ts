@@ -1,4 +1,4 @@
-import { Interaction } from "discord.js";
+import { ClientEvents, GuildMember, Interaction } from "discord.js";
 
 const META = Symbol("discord meta");
 
@@ -8,15 +8,35 @@ export interface DiscordMeta {
 }
 
 export interface DiscordHandlerMeta {
-  interaction: DiscordInteractionHandler[];
+  interaction: DiscordHandler<"interactionCreate">[];
+
+  memberJoin: DiscordHandler<"guildMemberAdd">[];
+  memberUpdate: DiscordHandler<"guildMemberUpdate">[];
+  memberLeave: DiscordHandler<"guildMemberRemove">[];
+
+  banCreate: DiscordHandler<"guildBanAdd">[];
+  banRemove: DiscordHandler<"guildBanRemove">[];
+
+  roleCreate: DiscordHandler<"roleCreate">[];
+  roleUpdate: DiscordHandler<"roleUpdate">[];
+  roleDelete: DiscordHandler<"roleDelete">[];
+
+  messageCreate: DiscordHandler<"messageCreate">[];
+  messageUpdate: DiscordHandler<"messageUpdate">[];
+  messageDelete: DiscordHandler<"messageDelete">[];
+
+  init: DiscordHandler<"ready">[];
+  voiceStateUpdate: DiscordHandler<"voiceStateUpdate">[];
 }
 
-export type DiscordInteractionHandler = ({}: {
-  interaction: Interaction;
+export type DiscordHandler<Field extends keyof ClientEvents> = (options: {
+  params: ClientEvents[Field];
   context: any;
   meta: DiscordMeta;
 }) => void;
 
+export type DiscordHandlerParams<Field extends keyof DiscordHandlerMeta> =
+  Parameters<DiscordHandlerMeta[Field][number]>[0]["params"];
 export function getDiscordMeta(cls: any) {
   return (cls[META] ??= createMeta());
 }
@@ -25,6 +45,19 @@ function createMeta(): DiscordMeta {
   return {
     handlers: {
       interaction: [],
+      memberJoin: [],
+      memberLeave: [],
+      memberUpdate: [],
+      banCreate: [],
+      banRemove: [],
+      roleCreate: [],
+      roleDelete: [],
+      roleUpdate: [],
+      messageCreate: [],
+      messageDelete: [],
+      messageUpdate: [],
+      init: [],
+      voiceStateUpdate: [],
     },
   };
 }
