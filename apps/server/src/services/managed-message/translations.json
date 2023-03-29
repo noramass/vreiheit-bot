@@ -47,6 +47,36 @@
         "en-US": "edit the content of a message",
         "de": "bearbeite den inhalt einer nachricht"
       }
+    },
+    "post": {
+      "name": {
+        "en-US": "post",
+        "de": "senden"
+      },
+      "desc": {
+        "en-US": "post a message (and delete it if it already exists)",
+        "de": "sende eine nachricht (und lösche sie an anderer stelle)"
+      }
+    },
+    "delete": {
+      "name": {
+        "en-US": "delete",
+        "de": "löschen"
+      },
+      "desc": {
+        "en-US": "delete a message (from the database and discord)",
+        "de": "lösche eine nachricht (aus der datenbank und discord)"
+      }
+    },
+    "list": {
+      "name": {
+        "en-US": "list",
+        "de": "liste"
+      },
+      "desc": {
+        "en-US": "list all messages",
+        "de": "liste alle nachrichten auf"
+      }
     }
   },
   "options": {

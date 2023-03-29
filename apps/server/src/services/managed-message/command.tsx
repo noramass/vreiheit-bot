@@ -1,5 +1,24 @@
 import { DiscordElements as React, JSX } from "@vreiheit/discord";
+import { ChannelType } from "discord.js";
 import t from "./translations.json";
+
+function SubCommand({
+  name,
+  children,
+}: {
+  name: keyof (typeof t)["subCommands"];
+  children?: any;
+}) {
+  return (
+    <subCommand
+      name={t.subCommands[name].name["en-US"]}
+      nameLocalizations={t.subCommands[name].name}
+      description={t.subCommands[name].desc["en-US"]}
+      descriptionLocalizations={t.subCommands[name].desc}>
+      {children}
+    </subCommand>
+  );
+}
 
 function Option({
   name,
@@ -7,13 +26,12 @@ function Option({
   required,
   autocomplete,
   type = "string",
+  ...options
 }: {
   name: keyof (typeof t)["options"];
-  type?: JSX.JsxSlashCommandOption["type"];
   children?: any[];
-  required?: boolean;
   autocomplete?: boolean;
-}) {
+} & Partial<JSX.JsxSlashCommandOption>) {
   return (
     <commandOption
       type={type}
@@ -22,14 +40,15 @@ function Option({
       description={t.options[name].desc["en-US"]}
       descriptionLocalizations={t.options[name].desc}
       autocomplete={autocomplete}
-      required={required}>
+      required={required}
+      {...options}>
       {children}
     </commandOption>
   );
 }
 
-function TagOption() {
-  return <Option name="tag" required autocomplete />;
+function TagOption({ required = true }: { required?: boolean }) {
+  return <Option name="tag" required={required} autocomplete />;
 }
 
 function TypeOption() {
@@ -53,25 +72,20 @@ function ContentOption() {
   return <Option name="content" />;
 }
 
-function ChannelOption() {
-  return <Option name="channel" type="channel" />;
-}
-
-function SubCommand({
-  name,
-  children,
-}: {
-  name: keyof (typeof t)["subCommands"];
-  children?: any;
-}) {
+function ChannelOption({ required }: { required?: boolean }) {
   return (
-    <subCommand
-      name={t.subCommands[name].name["en-US"]}
-      nameLocalizations={t.subCommands[name].name}
-      description={t.subCommands[name].desc["en-US"]}
-      descriptionLocalizations={t.subCommands[name].desc}>
-      {children}
-    </subCommand>
+    <Option
+      name="channel"
+      type="channel"
+      channelTypes={[
+        ChannelType.PublicThread,
+        ChannelType.AnnouncementThread,
+        ChannelType.PrivateThread,
+        ChannelType.GuildText,
+        ChannelType.GuildNews,
+      ]}
+      required={required}
+    />
   );
 }
 
@@ -83,7 +97,7 @@ export function managedMessageCommand() {
       description={t.name["en-US"]}
       descriptionLocalizations={t.desc}>
       <SubCommand name="refresh">
-        <TagOption />
+        <TagOption required={false} />
       </SubCommand>
       <SubCommand name="get">
         <TagOption />
@@ -99,6 +113,14 @@ export function managedMessageCommand() {
         <TypeOption />
         <ChannelOption />
       </SubCommand>
+      <SubCommand name="post">
+        <TagOption />
+        <ChannelOption required />
+      </SubCommand>
+      <SubCommand name="delete">
+        <TagOption />
+      </SubCommand>
+      <SubCommand name="list" />
     </slashCommand>
   );
 }
