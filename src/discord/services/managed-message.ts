@@ -379,12 +379,12 @@ export class ManagedMessageService {
     content: MessageCreateOptions | string,
     type: "content" | "embed" = "content",
   ) {
-    content = this.normaliseContent({ type } as ManagedMessage, content);
+    content = this.normaliseContent({ type } as ManagedMessage, content) as any;
     if (typeof channel === "string")
       channel = (await guild.channels.fetch(channel)) as TextBasedChannel;
     const server = await getServer(guild.id);
     const message = this.repo.create({
-      content: content.content,
+      content: (content as any).content,
       channelId: channel.id,
       guild: server,
       tag: id,
@@ -403,7 +403,8 @@ export class ManagedMessageService {
     content?: MessageEditOptions | string,
   ) {
     const message = await this.getManagedMessage(guild.id, id);
-    if (!message) return this.createMessage(guild, channel, id, content!);
+    if (!message)
+      return this.createMessage(guild, channel, id, (content as any)!);
     content = this.normaliseContent(message, content);
     if (typeof channel === "string")
       channel = (await guild.channels.fetch(channel)) as TextBasedChannel;
@@ -423,8 +424,8 @@ export class ManagedMessageService {
         /* ignore */
       }
     }
-    message.content = this.content(content);
-    const { id: messageId } = await channel.send(content);
+    message.content = this.content(content as any);
+    const { id: messageId } = await channel.send(content as any);
     message.messageId = messageId;
     message.channelId = channel.id;
     await this.repo.save(message);
@@ -446,7 +447,7 @@ export class ManagedMessageService {
       return (
         content ??
         (message.content
-          ? this.normaliseContent(message, message.content)
+          ? (this.normaliseContent(message, message.content as any) as any)
           : { content: null })
       );
   }
