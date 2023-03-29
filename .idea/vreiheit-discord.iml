@@ -6,9 +6,6 @@
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
       <excludeFolder url="file://$MODULE_DIR$/tmp" />
       <excludeFolder url="file://$MODULE_DIR$/apps/website/dist" />
-      <excludeFolder url="file://$MODULE_DIR$/packages/database/dist" />
-      <excludeFolder url="file://$MODULE_DIR$/packages/discord/dist" />
-      <excludeFolder url="file://$MODULE_DIR$/packages/util/dist" />
       <excludeFolder url="file://$MODULE_DIR$/data" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
     </content>

@@ -5,3 +5,5 @@ export * from "./server";
 export * from "./server-member";
 export * from "./support-ticket";
 export * from "./translation";
+export * from "./user";
+export * from "./session";

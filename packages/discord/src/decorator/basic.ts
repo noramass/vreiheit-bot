@@ -34,10 +34,10 @@ function basicDecorator<Field extends keyof DiscordHandlerMeta>(field: Field) {
       (...params: DiscordHandlerParams<Field>) => any
     >,
   ) {
-    getDiscordMeta(proto.constructor).handlers[field].push(async function (
-      this: any,
-      { params },
-    ) {
+    getDiscordMeta(proto.constructor).handlers[field].push(async function ({
+      params,
+      context,
+    }) {
       const first = params.length >= 1 ? params[0] : undefined;
       if (
         first &&
@@ -45,7 +45,7 @@ function basicDecorator<Field extends keyof DiscordHandlerMeta>(field: Field) {
         ("id" in first ? !next(first["id"]) : !next(first))
       )
         return;
-      return this[name].call(this, ...params);
+      return context[name].call(this, ...params);
     });
   };
 }

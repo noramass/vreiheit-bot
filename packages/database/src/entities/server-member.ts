@@ -1,10 +1,12 @@
 import { BlockedTerm } from "src/entities/blocked-term";
 import { Server } from "src/entities/server";
 import { SupportTicket } from "src/entities/support-ticket";
+import { User } from "src/entities/user";
 import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -76,4 +78,8 @@ export class ServerMember {
 
   @OneToMany(() => SupportTicket, ({ assigned }) => assigned)
   assignedTickets!: SupportTicket[];
+
+  @ManyToOne(() => User, ({ members }) => members, { nullable: true })
+  @JoinColumn({ name: "discordId" })
+  user?: User;
 }

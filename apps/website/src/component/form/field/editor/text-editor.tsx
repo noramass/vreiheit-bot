@@ -1,10 +1,12 @@
 import clsx from "clsx";
 import React, {
   ChangeEvent,
+  MouseEvent,
   KeyboardEvent,
   useCallback,
   useEffect,
   useState,
+  useLayoutEffect,
 } from "react";
 import { useGrowing } from "src/hook/growing";
 import classes from "./editor.module.pcss";
@@ -39,7 +41,7 @@ export function TextEditor({
   const prefix = itemMatches ? item.slice(0, itemIndex) : "";
   const suffix = itemMatches ? item.slice(itemIndex + current.length) : "";
 
-  useEffect(applySize, [value]);
+  useLayoutEffect(applySize, [value]);
   useEffect(() => setCurrent(value), [value]);
 
   const onChange = useCallback(
@@ -48,6 +50,24 @@ export function TextEditor({
       change(event.currentTarget.value);
     },
     [change],
+  );
+
+  const onContainerClick = useCallback((ev: MouseEvent<HTMLDivElement>) => {
+    if (!growRef.current) return;
+    const input = growRef.current!;
+    if (document.activeElement !== input) {
+      ev.preventDefault();
+      input.focus();
+    }
+    if (ev.target !== input) ev.preventDefault();
+  }, []);
+
+  const onContainerDoubleClick = useCallback(
+    (ev: MouseEvent<HTMLDivElement>) => {
+      growRef.current?.select();
+      ev.preventDefault();
+    },
+    [],
   );
 
   const onKeyDown = useCallback(
@@ -85,7 +105,9 @@ export function TextEditor({
         [classes.textEditor]: true,
         disabled,
         readonly,
-      })}>
+      })}
+      onMouseDown={onContainerClick}
+      onDoubleClickCapture={onContainerDoubleClick}>
       <span className={classes.prefix}>{prefix}</span>
       <input
         ref={growRef}

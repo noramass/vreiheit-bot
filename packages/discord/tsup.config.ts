@@ -4,7 +4,7 @@ export default defineConfig({
   entry: ["src/index.ts"],
   sourcemap: true,
   clean: true,
-  minify: true,
+  minify: false,
   dts: true,
   format: ["cjs", "esm"],
   target: "node18",

@@ -8,6 +8,7 @@ import {
   CommandInteractionOption,
   ContextMenuCommandInteraction,
   Interaction,
+  ModalSubmitInteraction,
 } from "discord.js";
 import {
   DiscordMeta,
@@ -19,7 +20,7 @@ import {
 
 export function OnInteraction(interactionId?: string) {
   const next = createLastFilter();
-  return interactionDecorator(
+  return interactionDecorator<Interaction, [string?, ...string[]]>(
     (interaction, context, { prefix }) => {
       if (!next(interaction.id)) return;
       return customIdMatches(interaction, prefix, interactionId);
@@ -33,7 +34,7 @@ export function OnInteraction(interactionId?: string) {
 
 export function OnButton(buttonId?: string) {
   const next = createLastFilter();
-  return interactionDecorator<ButtonInteraction>(
+  return interactionDecorator<ButtonInteraction, [string, ...string[]]>(
     (interaction, context, { prefix }) => {
       if (!next(interaction.id)) return;
       if (!interaction.isButton()) return;
@@ -44,6 +45,7 @@ export function OnButton(buttonId?: string) {
     },
   );
 }
+
 export function OnChatCommand(
   commandId?: string,
   subGroupId?: string,
@@ -90,15 +92,21 @@ export function OnCommand(commandId?: string) {
 
 export function OnModalSubmit(formId?: string) {
   const next = createLastFilter();
-  return interactionDecorator((interaction, context, { prefix }) => {
-    if (!next(interaction.id)) return false;
-    if (!interaction.isModalSubmit()) return false;
-    return customIdMatches(interaction, prefix, formId);
-  });
+  return interactionDecorator<ModalSubmitInteraction, [string, ...string[]]>(
+    (interaction, context, { prefix }) => {
+      if (!next(interaction.id)) return false;
+      if (!interaction.isModalSubmit()) return false;
+      return customIdMatches(interaction, prefix, formId);
+    },
+    (interaction, context, { prefix }) => {
+      return remainingId(interaction.customId, prefix, formId);
+    },
+  );
 }
 
 export function OnAutocomplete(command: string, option?: string) {
   const next = createLastFilter();
+
   function findFocusedOptionRecursive(
     options: ReadonlyArray<CommandInteractionOption>,
   ) {
@@ -108,7 +116,10 @@ export function OnAutocomplete(command: string, option?: string) {
     }
   }
 
-  return interactionDecorator<AutocompleteInteraction>(
+  return interactionDecorator<
+    AutocompleteInteraction,
+    [CommandInteractionOption, string]
+  >(
     interaction => {
       if (!next(interaction.id)) return;
       if (!interaction.isAutocomplete()) return;
@@ -134,7 +145,10 @@ function customIdMatches(
   return idMatches(interaction.customId, prefix, id);
 }
 
-function interactionDecorator<T extends BaseInteraction = Interaction>(
+function interactionDecorator<
+  T extends BaseInteraction = Interaction,
+  P extends any[] = any[],
+>(
   filter: (
     interaction: Interaction,
     context: any,
@@ -144,9 +158,14 @@ function interactionDecorator<T extends BaseInteraction = Interaction>(
     interaction: T,
     context: any,
     meta: DiscordMeta,
-  ) => PromiseOr<any[]>,
+  ) => PromiseOr<P>,
 ) {
-  return function (proto: any, name: string | symbol) {
+  return function (
+    proto: any,
+    name: string | symbol,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    desc: TypedPropertyDescriptor<(interaction: T, ...P) => any>,
+  ) {
     getDiscordMeta(proto.constructor).handlers.interaction.push(
       async function ({ context, params: [interaction], meta }) {
         if (!filter(interaction, context, meta)) return;

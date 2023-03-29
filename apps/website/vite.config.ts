@@ -42,7 +42,7 @@ export default defineConfig(async ({ mode, command }) => {
       viteReact(),
       // svelte({ preprocess: sveltePreprocess() }),
       tsconfigPaths({ loose: true }),
-      eslint({ exclude: "*.css" }),
+      eslint({ include: "src/**/*.tsx?" }),
     ],
     publicDir: "assets",
     server: {

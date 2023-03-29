@@ -1,0 +1,104 @@
+{
+  "name": {
+    "en-US": "message",
+    "de": "nachricht"
+  },
+  "desc": {
+    "en-US": "manage messages sent by the {{self.name}} bot",
+    "de": "verwalte nachrichten, die durch den {{self.name}} bot gesendet wurden"
+  },
+  "subCommands": {
+    "refresh": {
+      "name": {
+        "en-US": "refresh",
+        "de": "laden"
+      },
+      "desc": {
+        "en-US": "refresh all messages from the database",
+        "de": "lade alle nachrichten neu as der datenbank"
+      }
+    },
+    "get": {
+      "name": {
+        "en-US": "get",
+        "de": "anzeigen"
+      },
+      "desc": {
+        "en-US": "show the content of a message",
+        "de": "zeige den inhalt einer nachricht an"
+      }
+    },
+    "create": {
+      "name": {
+        "en-US": "create",
+        "de": "anlegen"
+      },
+      "desc": {
+        "en-US": "create a message",
+        "de": "erstelle eine nachricht"
+      }
+    },
+    "edit": {
+      "name": {
+        "en-US": "edit",
+        "de": "bearbeiten"
+      },
+      "desc": {
+        "en-US": "edit the content of a message",
+        "de": "bearbeite den inhalt einer nachricht"
+      }
+    }
+  },
+  "options": {
+    "tag": {
+      "name": {
+        "en-US": "name",
+        "de": "name"
+      },
+      "desc": {
+        "en-US": "the name of the message",
+        "de": "der name der nachricht"
+      }
+    },
+    "content": {
+      "name": {
+        "en-US": "content",
+        "de": "inhalt"
+      },
+      "desc": {
+        "en-US": "the new content of the message",
+        "de": "der neue inhalt der nachricht"
+      }
+    },
+    "channel": {
+      "name": {
+        "en-US": "channel",
+        "de": "kanal"
+      },
+      "desc": {
+        "en-US": "the channel to post the message in",
+        "de": "der kanal, in dem die nachricht erstellt werden soll"
+      }
+    },
+    "type": {
+      "name": {
+        "en-US": "type",
+        "de": "typ"
+      },
+      "desc": {
+        "en-US": "the type of message, either embed or plain",
+        "de": "der typ der nachricht, entweder einbettung oder simpel"
+      },
+      "values": {
+        "embed": {
+          "en-US": "embed",
+          "de": "einbettung"
+        },
+        "plain": {
+          "en-US": "plain",
+          "de": "simpel"
+        }
+      }
+    }
+  }
+}

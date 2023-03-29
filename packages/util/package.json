@@ -19,5 +19,10 @@
     "tslib": "^2.5.0",
     "tsup": "^6.6.3",
     "typescript": "^5.0.2"
+  },
+  "publishConfig": {
+    "main": "dist/index.js",
+    "module": "dist/index.mjs",
+    "types": "dist/index.d.ts"
   }
 }

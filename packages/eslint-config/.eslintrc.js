@@ -46,7 +46,7 @@ module.exports = {
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
-        varsIgnorePattern: "_",
+        varsIgnorePattern: "_|DiscordElements",
       },
     ],
     "@html-eslint/indent": ["error", 2],
@@ -104,5 +104,10 @@ module.exports = {
       },
     },*/
   ],
-  ignorePatterns: ["node_modules", "**/node_modules/**/*", "**/dist/**"],
+  ignorePatterns: [
+    "node_modules",
+    "**/node_modules/**/*",
+    "**/dist/**",
+    "dist",
+  ],
 };

@@ -19,4 +19,6 @@ export const discord = new Client({
   ],
 });
 
-export const discordLogin = () => discord.login(env("discord_token"));
+export const discordLogin = async () => {
+  await discord.login(env("discord_token"));
+};

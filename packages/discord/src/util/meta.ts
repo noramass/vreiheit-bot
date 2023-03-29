@@ -1,4 +1,4 @@
-import { ClientEvents, GuildMember, Interaction } from "discord.js";
+import { ClientEvents } from "discord.js";
 
 const META = Symbol("discord meta");
 
@@ -77,10 +77,10 @@ export function remainingId(
   toCheck: string,
   prefix?: string,
   id?: string,
-): string[] {
+): [string, ...string[]] {
   const full = prefixedId(prefix, id);
   return toCheck
     .slice(full.length + 1)
     .split(":")
-    .filter(it => it);
+    .filter(it => it) as [string, ...string[]];
 }
