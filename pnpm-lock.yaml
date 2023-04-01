@@ -130,6 +130,7 @@ importers:
 
   packages/discord:
     specifiers:
+      '@propero/easy-api': ^2.1.0
       '@vreiheit/eslint-config': workspace:^
       '@vreiheit/util': workspace:^
       diff: ^5.1.0
@@ -139,6 +140,7 @@ importers:
       tsup: ^6.6.3
       typescript: ^5.0.2
     dependencies:
+      '@propero/easy-api': 2.1.0
       '@vreiheit/util': link:../util
       diff: 5.1.0
       discord.js: 14.8.0

@@ -8,16 +8,6 @@
     "de": "verwalte nachrichten, die durch den {{self.name}} bot gesendet wurden"
   },
   "subCommands": {
-    "refresh": {
-      "name": {
-        "en-US": "refresh",
-        "de": "laden"
-      },
-      "desc": {
-        "en-US": "refresh all messages from the database",
-        "de": "lade alle nachrichten neu as der datenbank"
-      }
-    },
     "get": {
       "name": {
         "en-US": "get",
@@ -66,16 +56,6 @@
       "desc": {
         "en-US": "delete a message (from the database and discord)",
         "de": "lösche eine nachricht (aus der datenbank und discord)"
-      }
-    },
-    "list": {
-      "name": {
-        "en-US": "list",
-        "de": "liste"
-      },
-      "desc": {
-        "en-US": "list all messages",
-        "de": "liste alle nachrichten auf"
       }
     }
   },
@@ -128,6 +108,40 @@
           "en-US": "plain",
           "de": "simpel"
         }
+      }
+    }
+  },
+  "actions": {
+    "delete": {
+      "success": {
+        "de": "nachricht erfolgreich gelöscht!",
+        "en-US": "message deleted successfully!"
+      },
+      "no-perms": {
+        "de": "dir fehlt dazu die berechtigung!",
+        "en-US": "insufficient permissions!"
+      },
+      "error": {
+        "de": "beim löschen der nachricht ist ein Fehler aufgetreten.",
+        "en-US": "an error occurred while trying to delete the message."
+      }
+    },
+    "post": {
+      "success": {
+        "de": "nachricht erfolgreich gepostet!",
+        "en-US": "message posted successfully!"
+      }
+    },
+    "edit": {
+      "success": {
+        "de": "nachricht erfolgreich bearbeitet",
+        "en-US": "message updated successfully!"
+      }
+    },
+    "create": {
+      "success": {
+        "de": "nachricht erfolgreich angelegt",
+        "en-US": "message created successfully!"
       }
     }
   }

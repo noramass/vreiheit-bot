@@ -79,7 +79,10 @@ export class ServerMember {
   @OneToMany(() => SupportTicket, ({ assigned }) => assigned)
   assignedTickets!: SupportTicket[];
 
-  @ManyToOne(() => User, ({ members }) => members, { nullable: true })
+  @ManyToOne(() => User, ({ members }) => members, {
+    nullable: true,
+    createForeignKeyConstraints: false,
+  })
   @JoinColumn({ name: "discordId" })
   user?: User;
 }

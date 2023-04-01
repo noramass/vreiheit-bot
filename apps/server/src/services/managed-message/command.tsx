@@ -1,27 +1,29 @@
 import { DiscordElements as React, JSX } from "@vreiheit/discord";
 import { ChannelType } from "discord.js";
+import { lang } from "src/consts";
 import t from "./translations.json";
 
 function SubCommand({
-  name,
+  name: cmd,
   children,
 }: {
   name: keyof (typeof t)["subCommands"];
   children?: any;
 }) {
+  const { name, desc } = t.subCommands[cmd];
   return (
     <subCommand
-      name={t.subCommands[name].name["en-US"]}
-      nameLocalizations={t.subCommands[name].name}
-      description={t.subCommands[name].desc["en-US"]}
-      descriptionLocalizations={t.subCommands[name].desc}>
+      name={name[lang]}
+      nameLocalizations={name}
+      description={desc[lang]}
+      descriptionLocalizations={desc}>
       {children}
     </subCommand>
   );
 }
 
 function Option({
-  name,
+  name: option,
   children,
   required,
   autocomplete,
@@ -32,13 +34,14 @@ function Option({
   children?: any[];
   autocomplete?: boolean;
 } & Partial<JSX.JsxSlashCommandOption>) {
+  const { name, desc } = t.options[option];
   return (
     <commandOption
       type={type}
-      name={t.options[name].name["en-US"]}
-      nameLocalizations={t.options[name].name}
-      description={t.options[name].desc["en-US"]}
-      descriptionLocalizations={t.options[name].desc}
+      name={name[lang]}
+      nameLocalizations={name}
+      description={desc[lang]}
+      descriptionLocalizations={desc}
       autocomplete={autocomplete}
       required={required}
       {...options}>
@@ -47,8 +50,14 @@ function Option({
   );
 }
 
-function TagOption({ required = true }: { required?: boolean }) {
-  return <Option name="tag" required={required} autocomplete />;
+function TagOption({
+  required = true,
+  autocomplete = true,
+}: {
+  required?: boolean;
+  autocomplete?: boolean;
+}) {
+  return <Option name="tag" required={required} autocomplete={autocomplete} />;
 }
 
 function TypeOption() {
@@ -56,12 +65,12 @@ function TypeOption() {
     <Option name="type">
       <commandChoice
         value="embed"
-        name={t.options.type.values.embed["en-US"]}
+        name={t.options.type.values.embed[lang]}
         nameLocalizations={t.options.type.values.embed}
       />
       <commandChoice
         value="plain"
-        name={t.options.type.values.plain["en-US"]}
+        name={t.options.type.values.plain[lang]}
         nameLocalizations={t.options.type.values.plain}
       />
     </Option>
@@ -92,13 +101,10 @@ function ChannelOption({ required }: { required?: boolean }) {
 export function managedMessageCommand() {
   return (
     <slashCommand
-      name={t.name["en-US"]}
+      name={t.name[lang]}
       nameLocalizations={t.name}
-      description={t.name["en-US"]}
+      description={t.name[lang]}
       descriptionLocalizations={t.desc}>
-      <SubCommand name="refresh">
-        <TagOption required={false} />
-      </SubCommand>
       <SubCommand name="get">
         <TagOption />
       </SubCommand>
@@ -108,7 +114,7 @@ export function managedMessageCommand() {
         <TypeOption />
       </SubCommand>
       <SubCommand name="create">
-        <TagOption />
+        <TagOption autocomplete={false} />
         <ContentOption />
         <TypeOption />
         <ChannelOption />
@@ -120,7 +126,10 @@ export function managedMessageCommand() {
       <SubCommand name="delete">
         <TagOption />
       </SubCommand>
-      <SubCommand name="list" />
     </slashCommand>
   );
 }
+
+managedMessageCommand.meta = {
+  name: t.name[lang],
+};

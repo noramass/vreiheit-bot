@@ -1,3 +1,7 @@
+import {
+  createParameterMetaAccessors,
+  createParameterMetaDecoratorFactory,
+} from "@propero/easy-api";
 import { PromiseOr } from "@vreiheit/util";
 import {
   AutocompleteInteraction,
@@ -104,17 +108,17 @@ export function OnModalSubmit(formId?: string) {
   );
 }
 
+function findFocusedOptionRecursive(
+  options: ReadonlyArray<CommandInteractionOption>,
+) {
+  for (const option of options) {
+    if (option.options) return findFocusedOptionRecursive(option.options);
+    if (option.focused) return option;
+  }
+}
+
 export function OnAutocomplete(command: string, option?: string) {
   const next = createLastFilter();
-
-  function findFocusedOptionRecursive(
-    options: ReadonlyArray<CommandInteractionOption>,
-  ) {
-    for (const option of options) {
-      if (option.options) return findFocusedOptionRecursive(option.options);
-      if (option.focused) return option;
-    }
-  }
 
   return interactionDecorator<
     AutocompleteInteraction,
@@ -145,6 +149,49 @@ function customIdMatches(
   return idMatches(interaction.customId, prefix, id);
 }
 
+export type InteractionMetaGenerator<T = unknown> = (
+  interaction: BaseInteraction,
+  context: any,
+) => T;
+const { getMeta, setMeta } =
+  createParameterMetaAccessors<InteractionMetaGenerator>("interaction-meta");
+
+export const createInteractionInjector =
+  createParameterMetaDecoratorFactory(setMeta);
+
+function createOptionDecorator(key: keyof CommandInteractionOption) {
+  return (name: string, required?: boolean) =>
+    createInteractionInjector(() => interaction => {
+      if (!interaction.isCommand()) return;
+      return interaction.options.get(name, required)?.[key];
+    });
+}
+
+function Option(name: string) {
+  return createInteractionInjector(() => interaction => {
+    if ("options" in interaction) return interaction.options[name];
+  });
+}
+
+Option.Value = createOptionDecorator("value");
+Option.Channel = createOptionDecorator("channel");
+Option.Attachment = createOptionDecorator("attachment");
+Option.User = createOptionDecorator("user");
+Option.Role = createOptionDecorator("role");
+Option.Member = createOptionDecorator("member");
+Option.Focused = createInteractionInjector(() => interaction => {
+  if (!interaction.isAutocomplete()) return;
+  return findFocusedOptionRecursive(interaction.options.data);
+});
+Option.FocusedValue = createInteractionInjector(() => interaction => {
+  if (!interaction.isAutocomplete()) return;
+  return interaction.options.getFocused();
+});
+export const DC = {
+  Interaction: createInteractionInjector(() => interaction => interaction),
+  Option,
+};
+
 function interactionDecorator<
   T extends BaseInteraction = Interaction,
   P extends any[] = any[],
@@ -160,18 +207,20 @@ function interactionDecorator<
     meta: DiscordMeta,
   ) => PromiseOr<P>,
 ) {
-  return function (
-    proto: any,
-    name: string | symbol,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    desc: TypedPropertyDescriptor<(interaction: T, ...P) => any>,
-  ) {
+  return function (proto: any, name: string | symbol) {
+    const paramMeta = Object.values(getMeta(proto, name));
     getDiscordMeta(proto.constructor).handlers.interaction.push(
       async function ({ context, params: [interaction], meta }) {
         if (!filter(interaction, context, meta)) return;
+        if (paramMeta.length) {
+          const parameters = await Promise.all(
+            paramMeta.map(extract => extract(interaction, context)),
+          );
+          return context[name].call(context, ...parameters);
+        }
         const params =
           (await parameters?.(interaction as T, context, meta)) ?? [];
-        return context[name].call(this, interaction, ...params);
+        return context[name].call(context, interaction, ...params);
       },
     );
   };

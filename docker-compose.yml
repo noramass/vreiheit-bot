@@ -3,6 +3,7 @@ services:
   vreiheit_db:
     image: 'postgres:latest'
     container_name: vreiheit_db
+    restart: unless-stopped
     ports:
       - "5432:5432"
     volumes:
