@@ -93,57 +93,109 @@ client.on("ready", async client => {
 
 client.on("guildMemberRemove", async member => {
   for (const handler of registeredHandlers.memberLeave)
-    await handler(member as any);
+    try {
+      await handler(member as any);
+    } catch (err) {
+      console.error(err);
+    }
 });
 
 client.on("guildMemberAdd", async member => {
   for (const handler of registeredHandlers.memberJoin)
-    await handler(member as any);
+    try {
+      await handler(member as any);
+    } catch (err) {
+      console.error(err);
+    }
 });
 
 client.on("guildMemberUpdate", async (oldMember, newMember) => {
   for (const handler of registeredHandlers.memberUpdate)
-    await handler(oldMember as any, newMember);
+    try {
+      await handler(oldMember as any, newMember);
+    } catch (err) {
+      console.error(err);
+    }
 });
 
 client.on("guildBanAdd", async ban => {
-  for (const handler of registeredHandlers.ban) await handler(ban);
+  for (const handler of registeredHandlers.ban)
+    try {
+      await handler(ban);
+    } catch (err) {
+      console.error(err);
+    }
 });
 
 client.on("guildBanRemove", async ban => {
-  for (const handler of registeredHandlers.unban) await handler(ban);
+  for (const handler of registeredHandlers.unban)
+    try {
+      await handler(ban);
+    } catch (err) {
+      console.error(err);
+    }
 });
 
 client.on("roleUpdate", async (oldRole, newRole) => {
   for (const handler of registeredHandlers.roleUpdate)
-    await handler(oldRole, newRole);
+    try {
+      await handler(oldRole, newRole);
+    } catch (err) {
+      console.error(err);
+    }
 });
 
 client.on("roleCreate", async role => {
-  for (const handler of registeredHandlers.roleCreate) await handler(role);
+  for (const handler of registeredHandlers.roleCreate)
+    try {
+      await handler(role);
+    } catch (err) {
+      console.error(err);
+    }
 });
 
 client.on("roleDelete", async role => {
-  for (const handler of registeredHandlers.roleDelete) await handler(role);
+  for (const handler of registeredHandlers.roleDelete)
+    try {
+      await handler(role);
+    } catch (err) {
+      console.error(err);
+    }
 });
 
 client.on("messageCreate", async message => {
   for (const handler of registeredHandlers.messageCreate)
-    await handler(message);
+    try {
+      await handler(message);
+    } catch (err) {
+      console.error(err);
+    }
 });
 
 client.on("messageUpdate", async (oldMessage, newMessage) => {
   for (const handler of registeredHandlers.messageUpdate)
-    await handler(oldMessage as any, newMessage as any);
+    try {
+      await handler(oldMessage as any, newMessage as any);
+    } catch (err) {
+      console.error(err);
+    }
 });
 
 client.on("messageDelete", async message => {
   for (const handler of registeredHandlers.messageDelete)
-    await handler(message as any);
+    try {
+      await handler(message as any);
+    } catch (err) {
+      console.error(err);
+    }
 });
 client.on("voiceStateUpdate", async (oldState, newState) => {
   for (const handler of registeredHandlers.voiceStateUpdate)
-    await handler(oldState, newState);
+    try {
+      await handler(oldState, newState);
+    } catch (err) {
+      console.error(err);
+    }
 });
 
 client.on("error", console.error);
