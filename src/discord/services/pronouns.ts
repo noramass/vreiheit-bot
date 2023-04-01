@@ -176,17 +176,16 @@ export class Pronouns {
     const color =
       form.fields.getField("color", ComponentType.TextInput).value || "#86efac";
     const name = form.fields.getField("name", ComponentType.TextInput).value;
-    if (!name || name.length > 20) await form.followUp("Ungültige Pronomen");
-    else if (!/^#[0-9a-fA-F]{6}$/.test(color))
-      await form.followUp("Ungültiger Farbcode");
-    else {
-      await form.deferUpdate();
-      await this.createCustomPronounRole(
-        form.member as GuildMember,
-        name,
-        color as any,
-      );
-    }
+    if (!name || name.length > 20)
+      return await form.reply("Ungültige Pronomen");
+    if (!/^#[0-9a-fA-F]{6}$/.test(color))
+      return await form.reply("Ungültiger Farbcode");
+    await form.deferUpdate();
+    await this.createCustomPronounRole(
+      form.member as GuildMember,
+      name,
+      color as any,
+    );
   }
 
   @OnMemberLeave()
