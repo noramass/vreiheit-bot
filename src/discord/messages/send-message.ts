@@ -27,8 +27,12 @@ export async function editMessage(
   messageId: string,
   body: string | MessageEditOptions | MessagePayload,
 ) {
-  const message = await findMessage(guild, channel, messageId);
-  return message.edit(body);
+  try {
+    const message = await findMessage(guild, channel, messageId);
+    return message?.edit(body);
+  } catch (e) {
+    return;
+  }
 }
 
 const noop = () => {};
