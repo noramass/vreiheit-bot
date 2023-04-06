@@ -8,7 +8,9 @@
       <excludeFolder url="file://$MODULE_DIR$/apps/website/dist" />
       <excludeFolder url="file://$MODULE_DIR$/data" />
       <excludeFolder url="file://$MODULE_DIR$/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/apps/server/node_modules" />
     </content>
+    <content url="file://$MODULE_DIR$/apps/server/node_modules" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

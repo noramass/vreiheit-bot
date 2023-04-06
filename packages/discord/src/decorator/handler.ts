@@ -40,18 +40,29 @@ export function createDiscordServiceDecorator() {
       voiceStateUpdate: "voiceStateUpdate",
     };
 
+    const allHandlers: Record<string, any[]> = {};
+
     for (const { meta, instance } of services) {
       for (const type of Object.keys(
         meta.handlers,
       ) as (keyof DiscordHandlerMeta)[]) {
         const handlers = meta.handlers[type];
         if (!handlers.length) continue;
-        client.on(map[type], async (...params: any[]) => {
+        (allHandlers[map[type]] ??= []).push(async (...params: any[]) => {
           for (const handler of handlers)
             (handler as any)({ params, meta, context: instance });
         });
       }
     }
+    for (const [event, handlers] of Object.entries(allHandlers))
+      client.on(event, async (...params: any[]) => {
+        for (const handler of handlers)
+          try {
+            await handler(...params);
+          } catch (e) {
+            console.error(e);
+          }
+      });
   }
 
   return [DiscordService, applyServices] as const;

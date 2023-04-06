@@ -20,14 +20,23 @@ export class Poll {
   @Column("varchar")
   description!: string;
 
-  @Column("varchar", {
-    transformer: stringList(";"),
-  })
+  @Column("varchar", { transformer: stringList(";") })
   options!: string[];
 
-  @Column("jsonb")
-  counts!: Record<string, string>;
+  @Column("boolean", { default: true })
+  single!: boolean;
 
+  /**
+   * map user id to selected choice(s)
+   */
+  @Column("jsonb")
+  counts!: this extends { single: true }
+    ? Record<string, string>
+    : Record<string, string[]>;
+
+  /**
+   * map choice to vote count
+   */
   @Column("jsonb")
   results!: Record<string, number>;
 

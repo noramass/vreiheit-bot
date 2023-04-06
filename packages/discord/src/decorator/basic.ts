@@ -1,3 +1,4 @@
+import { Client } from "discord.js";
 import {
   DiscordHandlerMeta,
   getDiscordMeta,
@@ -25,7 +26,6 @@ export const OnBanRemove = basicDecorator("banRemove");
 export const OnInit = basicDecorator("init");
 
 function basicDecorator<Field extends keyof DiscordHandlerMeta>(field: Field) {
-  const next = createLastFilter();
   return function (
     proto: any,
     name: string | symbol,
@@ -34,6 +34,7 @@ function basicDecorator<Field extends keyof DiscordHandlerMeta>(field: Field) {
       (...params: DiscordHandlerParams<Field>) => any
     >,
   ) {
+    const next = createLastFilter();
     getDiscordMeta(proto.constructor).handlers[field].push(async function ({
       params,
       context,
@@ -42,10 +43,11 @@ function basicDecorator<Field extends keyof DiscordHandlerMeta>(field: Field) {
       if (
         first &&
         typeof first === "object" &&
+        !(first instanceof Client) &&
         ("id" in first ? !next(first["id"]) : !next(first))
       )
         return;
-      return context[name].call(this, ...params);
+      return context[name].call(context, ...params);
     });
   };
 }

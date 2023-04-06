@@ -129,7 +129,9 @@ export function OnAutocomplete(command: string, option?: string) {
       if (!interaction.isAutocomplete()) return;
       if (interaction.commandName !== command) return false;
       if (option)
-        return interaction.options.data.find(it => it.focused).name === option;
+        return (
+          findFocusedOptionRecursive(interaction.options.data)?.name === option
+        );
       else return true;
     },
     interaction => [

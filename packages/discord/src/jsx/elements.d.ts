@@ -1,4 +1,4 @@
-import { Locale, ChannelType } from "discord.js";
+import { Locale, ChannelType, TextInputStyle, ButtonStyle } from "discord.js";
 
 export declare namespace JSX {
   type LocaleMap = Partial<Record<`${Locale}`, string>>;
@@ -21,27 +21,27 @@ export declare namespace JSX {
 
   interface WithAutocomplete<T> {
     autocomplete?: boolean;
-    children?: JsxCommandOptionChoice<T>[];
+    children?: JsxCommandOptionChoiceProps<T>[];
   }
 
-  interface JsxCommandOptionChoice<T = string | number> extends WithName {
+  interface JsxCommandOptionChoiceProps<T = string | number> extends WithName {
     value: T;
   }
 
-  interface JsxSlashCommand extends WithNameAndDesc {
+  interface JsxSlashCommandProps extends WithNameAndDesc {
     children?:
-      | JsxSlashCommandOption[]
-      | (JsxSlashSubCommand | JsxSlashSubCommandGroup)[];
+      | JsxSlashCommandOptionProps[]
+      | (JsxSlashSubCommandProps | JsxSlashSubCommandGroupProps)[];
     dm?: boolean;
     nsfw?: boolean;
   }
 
-  interface JsxSlashSubCommand extends WithNameAndDesc {
-    children?: JsxSlashCommandOption[];
+  interface JsxSlashSubCommandProps extends WithNameAndDesc {
+    children?: JsxSlashCommandOptionProps[];
   }
 
-  interface JsxSlashSubCommandGroup extends WithNameAndDesc {
-    children?: JsxSlashSubCommand[];
+  interface JsxSlashSubCommandGroupProps extends WithNameAndDesc {
+    children?: JsxSlashSubCommandProps[];
   }
 
   interface JsxSlashCommandOptionBase extends WithNameAndDesc {
@@ -105,7 +105,7 @@ export declare namespace JSX {
     type: "user";
   }
 
-  type JsxSlashCommandOption =
+  type JsxSlashCommandOptionProps =
     | JsxSlashCommandStringOption
     | JsxSlashCommandAttachmentOption
     | JsxSlashCommandChannelOption
@@ -116,12 +116,60 @@ export declare namespace JSX {
     | JsxSlashCommandRoleOption
     | JsxSlashCommandUserOption;
 
+  interface ModalProps {
+    title: string;
+    customId: string;
+    children?: Element[];
+  }
+
+  interface ActionRowProps {
+    children?: Element[];
+  }
+
+  interface TextInputProps {
+    style: TextInputStyle;
+    label: string;
+    customId: string;
+    required?: boolean;
+    placeholder?: string;
+    value?: string;
+  }
+
+  interface EmbedProps {
+    title?: string;
+    description?: string;
+    footer?: { text: string };
+    fields?: Element[];
+  }
+
+  interface FieldProps {
+    name: string;
+    value: string;
+  }
+
+  interface ButtonProps {
+    customId: string;
+    style: ButtonStyle;
+    label?: string;
+    url?: string;
+    emoji?: string;
+    disabled?: boolean;
+  }
+
   interface IntrinsicElements {
-    slashCommand: JsxSlashCommand;
-    subCommand: JsxSlashSubCommand;
-    subCommandGroup: JsxSlashSubCommandGroup;
-    commandOption: JsxSlashCommandOption;
-    commandChoice: JsxCommandOptionChoice;
+    slashCommand: JsxSlashCommandProps;
+    subCommand: JsxSlashSubCommandProps;
+    subCommandGroup: JsxSlashSubCommandGroupProps;
+    commandOption: JsxSlashCommandOptionProps;
+    commandChoice: JsxCommandOptionChoiceProps;
+
+    modal: ModalProps;
+    actionRow: ActionRowProps;
+    textInput: TextInputProps;
+
+    embed: EmbedProps;
+    field: FieldProps;
+    button: ButtonProps;
   }
   type Element = keyof IntrinsicElements;
 }

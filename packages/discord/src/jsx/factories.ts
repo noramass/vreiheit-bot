@@ -1,4 +1,13 @@
-import { SlashCommandBuilder, SlashCommandSubcommandBuilder } from "discord.js";
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  EmbedBuilder,
+  ModalBuilder,
+  SlashCommandBuilder,
+  SlashCommandSubcommandBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+} from "discord.js";
 import { applySetters, setterName, upperFirst } from "./util";
 import type { JSX } from "./elements";
 
@@ -67,8 +76,43 @@ interface WrappedJSX<T, Extracted extends ArrayExtract<T> = ArrayExtract<T>> {
 }
 
 export class DiscordElementFactories {
+  static modal(options: any, children: any[]) {
+    options.required ??= false;
+    const modal = new ModalBuilder();
+    applySetters(modal, options);
+    modal.setComponents(children);
+    return modal;
+  }
+
+  static actionRow(options: any, children: any[]): any {
+    return new ActionRowBuilder().setComponents(children);
+  }
+
+  static textInput(options: any) {
+    options.style ??= TextInputStyle.Short;
+    const input = new TextInputBuilder();
+    applySetters(input, options);
+    return input;
+  }
+
+  static embed(options: any) {
+    const embed = new EmbedBuilder();
+    applySetters(embed, options);
+    return embed;
+  }
+
+  static field(options: any) {
+    return options;
+  }
+
+  static button(options: any) {
+    const btn = new ButtonBuilder();
+    applySetters(btn, options);
+    return btn;
+  }
+
   static _subCommand(
-    cmd: WrappedJSX<JSX.JsxSlashSubCommand>,
+    cmd: WrappedJSX<JSX.JsxSlashSubCommandProps>,
     builder: SlashCommandSubcommandBuilder,
   ) {
     const { options, children } = cmd;
@@ -81,7 +125,7 @@ export class DiscordElementFactories {
   }
 
   static _applyOption(
-    option: WrappedJSX<JSX.JsxSlashCommandOption>,
+    option: WrappedJSX<JSX.JsxSlashCommandOptionProps>,
     builder: SlashCommandBuilder | SlashCommandSubcommandBuilder,
   ) {
     const replacements = (
@@ -109,7 +153,7 @@ export class DiscordElementFactories {
       nsfw: "setNSFW",
     });
     for (const child of children as WrappedJSX<
-      JSX.JsxSlashCommand["children"]
+      JSX.JsxSlashCommandProps["children"]
     >[]) {
       switch (child.type) {
         case "subCommand":

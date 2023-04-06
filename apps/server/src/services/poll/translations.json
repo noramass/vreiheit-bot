@@ -1,0 +1,168 @@
+{
+  "name": {
+    "de": "umfrage",
+    "en-US": "poll"
+  },
+  "desc": {
+    "de": "verwalte umfragen auf dem server",
+    "en-US": "manage polls on this server"
+  },
+  "subCommands": {
+    "create": {
+      "name": {
+        "de": "erstellen",
+        "en-US": "create"
+      },
+      "desc": {
+        "de": "erstelle eine umfrage",
+        "en-US": "create a poll"
+      }
+    },
+    "edit": {
+      "name": {
+        "de": "bearbeiten",
+        "en-US": "edit"
+      },
+      "desc": {
+        "de": "bearbeite eine umfrage",
+        "en-US": "edit a poll"
+      }
+    },
+    "conclude": {
+      "name": {
+        "de": "beenden",
+        "en-US": "conclude"
+      },
+      "desc": {
+        "de": "beende eine umfrage",
+        "en-US": "conclude a poll"
+      }
+    },
+    "reset": {
+      "name": {
+        "de": "zurücksetzen",
+        "en-US": "reset"
+      },
+      "desc": {
+        "de": "setze eine umfrage zurück",
+        "en-US": "reset a poll"
+      }
+    },
+    "abort": {
+      "name": {
+        "de": "abbrechen",
+        "en-US": "abort"
+      },
+      "desc": {
+        "de": "breche eine umfrage ab",
+        "en-US": "abort a poll"
+      }
+    }
+  },
+  "options": {
+    "poll": {
+      "name": {
+        "de": "umfrage",
+        "en-US": "poll"
+      },
+      "desc": {
+        "de": "die betreffende umfrage",
+        "en-US": "the poll"
+      }
+    },
+    "options": {
+      "name": {
+        "de": "optionen",
+        "en-US": "options"
+      },
+      "desc": {
+        "de": "eine komma-separierte liste an optionen",
+        "en-US": "a comma separated list of options"
+      }
+    },
+    "title": {
+      "name": {
+        "de": "titel",
+        "en-US": "title"
+      },
+      "desc": {
+        "de": "der titel der umfrage",
+        "en-US": "the title of the poll"
+      }
+    },
+    "desc": {
+      "name": {
+        "de": "beschreibung",
+        "en-US": "desc"
+      },
+      "desc": {
+        "de": "die beschreibung der umfrage",
+        "en-US": "the description of the poll"
+      }
+    },
+    "timeframe": {
+      "name": {
+        "de": "zeitrahmen",
+        "en-US": "timeframe"
+      },
+      "desc": {
+        "de": "der zeitrahmen der umfrage - wie lange die umfrage gehen soll",
+        "en-US": "the timeframe for the poll - when it should conclude"
+      }
+    },
+    "channel": {
+      "name": {
+        "de": "kanal",
+        "en-US": "channel"
+      },
+      "desc": {
+        "de": "der kanal, in dem die umfrage abgehalten werden soll",
+        "en-US": "the channel, the poll should take place in"
+      }
+    },
+    "multipleChoice": {
+      "name": {
+        "de": "multiple-choice",
+        "en-US": "multiple-choice"
+      },
+      "desc": {
+        "de": "true für mehrfach auswahl",
+        "en-US": "true for multiple choice"
+      }
+    }
+  },
+  "actions": {
+    "delete": {
+      "success": {
+        "de": "umfrage erfolgreich gelöscht!",
+        "en-US": "poll deleted successfully!"
+      },
+      "no-perms": {
+        "de": "dir fehlt dazu die berechtigung!",
+        "en-US": "insufficient permissions!"
+      },
+      "error": {
+        "de": "beim löschen der umfrage ist ein Fehler aufgetreten.",
+        "en-US": "an error occurred while trying to delete the poll."
+      }
+    },
+    "edit": {
+      "success": {
+        "de": "umfrage erfolgreich bearbeitet",
+        "en-US": "poll updated successfully!"
+      }
+    },
+    "create": {
+      "success": {
+        "de": "umfrage erfolgreich angelegt",
+        "en-US": "poll created successfully!"
+      }
+    }
+  },
+  "ui": {
+    "open": "Geöffnet bis",
+    "closed": "Geschlossen seit",
+    "header": "Umfrage: {{text}}",
+    "results": "Resultate"
+  }
+}

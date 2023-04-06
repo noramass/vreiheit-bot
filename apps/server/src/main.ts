@@ -17,6 +17,7 @@ export async function main(): Promise<Express> {
 
   await dataSource.initialize();
   await dataSource.synchronize();
+  await dataSource.runMigrations();
 
   app.use(
     cookieParser(),

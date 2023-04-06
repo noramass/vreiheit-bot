@@ -10,4 +10,5 @@ export default defineConfig({
   target: "node18",
   outDir: "dist",
   esbuildPlugins: [],
+  loader: { ".sql": "text" },
 });

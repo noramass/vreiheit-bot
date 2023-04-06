@@ -1,5 +1,6 @@
 import * as entities from "src/entities";
 import { env, PromiseOr } from "@vreiheit/util";
+import { TogglePollChoice1680779710292 } from "src/migrations/1680779710292-toggle-poll-choice";
 import { DataSource, EntityTarget, FindOptionsWhere } from "typeorm";
 
 export const dataSource = new DataSource({
@@ -11,7 +12,7 @@ export const dataSource = new DataSource({
   password: env("postgres_password", "vreiheit"),
   synchronize: true,
   entities: Object.values(entities),
-  migrations: [],
+  migrations: [TogglePollChoice1680779710292],
   subscribers: [],
 });
 
