@@ -60,6 +60,9 @@ export class ServerMember {
   suspect!: boolean;
 
   @Column("varchar", { nullable: true })
+  locale?: string;
+
+  @Column("varchar", { nullable: true })
   suspectThreadId!: string;
 
   @Column("jsonb", { default: {} })
