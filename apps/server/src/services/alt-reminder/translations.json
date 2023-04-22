@@ -1,0 +1,6 @@
+{
+  "reminderText": {
+    "de": "Hey! Das Bild, das Du gerade eingestellt hast, hat keine Beschreibung. Dies schließt blinde oder sehbehinderte Benutzer*innen von der vollen Teilnahme an dieser Gemeinschaft aus.\n\nBitte, wenn möglich, poste Dein Bild mit einem Alt-Text [Eine Anleitung findest Du hier.](https://support.discord.com/hc/en-us/articles/211866427-How-do-I-upload-images-and-GIFs-#h_01GWWTHYJEV2S1WCDGFEMY21AQ)",
+    "en-US": "Hey! The image you have just posted does not have a description. This excludes blind or low vision users from fully participating in this community.\n\nPlease, if possible, re-post your image with an alt-text. [A tutorial can be found here.](https://support.discord.com/hc/en-us/articles/211866427-How-do-I-upload-images-and-GIFs-#h_01GWWTHYJEV2S1WCDGFEMY21AQ)"
+  }
+}
