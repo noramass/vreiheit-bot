@@ -1,5 +1,5 @@
 module.exports = async function (core, context, github) {
-  const iterator = octokit.paginate.iterator(github.rest.repos.listReleases, {
+  const iterator = github.paginate.iterator(github.rest.repos.listReleases, {
     ...context,
     per_page: 100
   });
