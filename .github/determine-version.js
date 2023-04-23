@@ -1,6 +1,7 @@
 module.exports = async function (core, context, github) {
   const iterator = github.paginate.iterator(github.rest.repos.listReleases, {
-    ...context,
+    owner: context.repo.owner,
+    repo: context.repo.repo,
     per_page: 100
   });
 
