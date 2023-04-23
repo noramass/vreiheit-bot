@@ -9,7 +9,7 @@ interface DiscordServiceMeta {
 
 export function createDiscordServiceDecorator() {
   const services: DiscordServiceMeta[] = [];
-  function DiscordService(prefix?: string) {
+  function DiscordController(prefix?: string) {
     return function <T>(cls: T): T {
       const meta = getDiscordMeta(cls);
       meta.prefix = prefix;
@@ -65,7 +65,8 @@ export function createDiscordServiceDecorator() {
       });
   }
 
-  return [DiscordService, applyServices] as const;
+  return [DiscordController, applyServices] as const;
 }
 
-export const [DiscordService, applyServices] = createDiscordServiceDecorator();
+export const [DiscordController, applyServices] =
+  createDiscordServiceDecorator();
