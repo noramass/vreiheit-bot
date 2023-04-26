@@ -23,29 +23,34 @@ jobs:
         with:
           node-version: 18
       - name: install dependencies
-        run: npm i -g pnpm && pnpm i
+        run: npm i -g pnpm && pnpm i --ignore-scripts
       - name: lint apps/server
         uses: wearerequired/lint-action@v2.3.0
         with:
           eslint: true
           eslint_dir: apps/server
+          eslint_extensions: "ts,tsx"
       - name: lint apps/website
         uses: wearerequired/lint-action@v2.3.0
         with:
           eslint: true
           eslint_dir: apps/website
+          eslint_extensions: "ts,tsx"
       - name: lint packages/database
         uses: wearerequired/lint-action@v2.3.0
         with:
           eslint: true
           eslint_dir: packages/database
+          eslint_extensions: "ts,tsx"
       - name: lint packages/discord
         uses: wearerequired/lint-action@v2.3.0
         with:
           eslint: true
           eslint_dir: packages/discord
+          eslint_extensions: "ts,tsx"
       - name: lint packages/util
         uses: wearerequired/lint-action@v2.3.0
         with:
           eslint: true
           eslint_dir: packages/util
+          eslint_extensions: "ts,tsx"
