@@ -2,7 +2,7 @@ import { Get, Param, Service } from "@propero/easy-api";
 import { dataSource, ManagedMessage, Server } from "@vreiheit/database";
 import {
   OnInit,
-  DiscordService,
+  DiscordController,
   ensureCommand,
   OnAutocomplete,
   OnChatCommand,
@@ -20,7 +20,7 @@ import { UserGuilds } from "src/decorators/user-guilds";
 import { ILike, Repository } from "typeorm";
 import t from "./translations.json";
 
-@DiscordService("managed-message")
+@DiscordController("managed-message")
 @Service("/managed-message")
 export class ManagedMessageService {
   get repo(): Repository<ManagedMessage> {
