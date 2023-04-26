@@ -2,14 +2,14 @@
 import { dataSource, ServerMember } from "@vreiheit/database";
 import {
   DiscordElements as React,
-  DiscordService,
+  DiscordController,
   OnMessageCreate,
   OnMessageDelete,
 } from "@vreiheit/discord";
 import { Message } from "discord.js";
 import t from "./translations.json";
 
-@DiscordService()
+@DiscordController()
 @Service()
 export class AltReminderService {
   get users() {

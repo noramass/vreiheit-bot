@@ -3,7 +3,7 @@ import { Poll, dataSource, Safe, defineProcedure } from "@vreiheit/database";
 import {
   DC,
   discord,
-  DiscordService,
+  DiscordController,
   ensureCommand,
   getSingleCached,
   OnAutocomplete,
@@ -44,7 +44,7 @@ interface PollOptions {
 
 type FullPollOptions = Required<PollOptions>;
 
-@DiscordService("poll")
+@DiscordController("poll")
 @Service("/poll")
 export class PollService {
   scheduled: Record<string, number> = {};
