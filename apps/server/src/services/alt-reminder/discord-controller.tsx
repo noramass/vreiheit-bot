@@ -2,10 +2,6 @@
 import {
   DiscordController,
   DiscordElements as React,
-<<<<<<< HEAD:apps/server/src/services/alt-reminder/discord-controller.tsx
-=======
-  DiscordController,
->>>>>>> dev:apps/server/src/services/alt-reminder/service.tsx
   OnMessageCreate,
   OnMessageDelete,
 } from "@vreiheit/discord";
@@ -13,12 +9,7 @@ import { Message } from "discord.js";
 import t from "./translations.json";
 
 @DiscordController()
-<<<<<<< HEAD:apps/server/src/services/alt-reminder/discord-controller.tsx
 export class AltReminderDiscordController {
-=======
-@Service()
-export class AltReminderService {
->>>>>>> dev:apps/server/src/services/alt-reminder/service.tsx
   get users() {
     return dataSource.getRepository(ServerMember);
   }
