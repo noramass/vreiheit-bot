@@ -2,6 +2,7 @@ export * from "./arrays";
 export * from "./colors";
 export * from "./diff";
 export * from "./env";
+export * from "./injection";
 export * from "./iterator";
 export * from "./lookups";
 export * from "./math";
