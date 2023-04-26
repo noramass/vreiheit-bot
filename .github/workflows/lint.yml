@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: 18
       - name: install dependencies
-        run: pnpm i
+        run: npm i -g pnpm && pnpm i
       - name: lint apps/server
         uses: wearerequired/lint-action@v2.3.0
         with:
