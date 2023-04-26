@@ -1,0 +1,51 @@
+name: lint
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+permissions:
+  checks: write
+  contents: write
+
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@maste
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 18
+      - name: install dependencies
+        run: pnpm i
+      - name: lint apps/server
+        uses: wearerequired/lint-action@v2.3.0
+        with:
+          eslint: true
+          eslint_dir: apps/server
+      - name: lint apps/website
+        uses: wearerequired/lint-action@v2.3.0
+        with:
+          eslint: true
+          eslint_dir: apps/website
+      - name: lint packages/database
+        uses: wearerequired/lint-action@v2.3.0
+        with:
+          eslint: true
+          eslint_dir: packages/database
+      - name: lint packages/discord
+        uses: wearerequired/lint-action@v2.3.0
+        with:
+          eslint: true
+          eslint_dir: packages/discord
+      - name: lint packages/util
+        uses: wearerequired/lint-action@v2.3.0
+        with:
+          eslint: true
+          eslint_dir: packages/util
