@@ -2,12 +2,13 @@ import express, { Express } from "express";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import { TypeormStore } from "connect-typeorm";
-import { createExpressErrorHandler, createService } from "@propero/easy-api";
+import { createExpressErrorHandler } from "@propero/easy-api";
 import { dataSource, Session } from "@vreiheit/database";
 import { discordLogin } from "@vreiheit/discord";
 import { applyServices, discord } from "@vreiheit/discord";
 import { env, isDev } from "@vreiheit/util";
-import * as Services from "./services";
+import { api } from "src/mount";
+import "src/services";
 
 const app = express();
 const path = "node_modules/@vreiheit/website/dist";
@@ -44,8 +45,7 @@ export async function main(): Promise<Express> {
     next();
   });
 
-  for (const Service of Object.values(Services))
-    app.use(`/api`, createService(new Service()));
+  app.use(`/api`, api);
 
   applyServices(discord);
   await discordLogin();
