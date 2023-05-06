@@ -3,6 +3,12 @@
 /data
 **/node_modules
 **/dist
+**/.next
+
+.idea/dataSources
+.idea/dataSources.local.xml
+.idea/dataSources.xml
+
 
 .env.local
 .env.*.local

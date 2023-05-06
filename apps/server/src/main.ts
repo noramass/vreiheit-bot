@@ -11,10 +11,12 @@ import { api } from "src/mount";
 import "src/services";
 
 const app = express();
-const path = "node_modules/@vreiheit/website/dist";
+const path = "node_modules/@vreiheit/client/.next/static";
 
 export async function main(): Promise<Express> {
   if (isDev()) console.log("development mode enabled");
+
+  const { nextApp } = await import("@vreiheit/client/app.mjs");
 
   await dataSource.initialize();
   await dataSource.synchronize();
@@ -55,9 +57,11 @@ export async function main(): Promise<Express> {
     res.status(404).json({ status: 404, error: "Not Found" }),
   );
 
-  app.use(express.static(path));
+  app.use("/_next/static", express.static(".next/static"));
   // index fallback for non api routes
-  app.use("*", express.static(`${path}/index.html`));
+  // app.use("*", express.static(`${path}/index.html`));
+  await nextApp.prepare();
+  app.use("*", nextApp.getRequestHandler());
 
   return app;
 }

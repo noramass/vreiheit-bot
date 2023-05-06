@@ -1,0 +1,12 @@
+{
+  "extends": ["next/core-web-vitals", "@vreiheit/eslint-config"],
+  "root": true,
+  "rules": {
+    "no-console": "off"
+  },
+  "ignorePatterns": [
+    "node_modules",
+    "dist",
+    "*.css"
+  ]
+}
