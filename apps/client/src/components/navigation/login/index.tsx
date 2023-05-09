@@ -1,7 +1,20 @@
 import { useUserContext } from "src/context/user-context";
 
-export function NavLogin() {
+export interface NavLoginProps {
+  onLogin?(): void;
+  onLogout?(): void;
+}
+
+export function NavLogin({ onLogin, onLogout }: NavLoginProps) {
   const { user, login, logout } = useUserContext();
+
+  function doLogin() {
+    login().then(onLogin);
+  }
+
+  function doLogout() {
+    logout().then(onLogout);
+  }
 
   if (user)
     return (
@@ -13,7 +26,7 @@ export function NavLogin() {
           <a
             className="text-sm text-teal-600 -mt-1 cursor-pointer"
             tabIndex={0}
-            onClick={logout}>
+            onClick={doLogout}>
             Logout
           </a>
         </div>
@@ -23,7 +36,7 @@ export function NavLogin() {
     return (
       <button
         className="block rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-teal-700"
-        onClick={login}>
+        onClick={doLogin}>
         Login
       </button>
     );

@@ -1,4 +1,3 @@
-import axios from "axios";
 import {
   createContext,
   useCallback,
@@ -7,6 +6,8 @@ import {
   useMemo,
   useState,
 } from "react";
+import { http } from "src/util/client";
+import { openWindow } from "src/util/window";
 
 export interface User {
   username: string;
@@ -46,35 +47,17 @@ export function UserContextProvider({
   const [user, setUser] = useState(initialUser);
 
   const refresh = useCallback(async () => {
-    // todo: refresh logic
-    const {
-      data: { user },
-    } = await axios.get("/api/auth/me");
-    setUser(user);
+    const { data } = await http.get("/auth/me").catch(() => ({ data: {} }));
+    setUser(data.user);
   }, []);
 
   const login = useCallback(async () => {
-    await new Promise<void>((resolve, reject) => {
-      const w = window.open("/api/auth/authorize", "_blank")!;
-      if (!w) reject("popup");
-      const timeoutId = setTimeout(() => {
-        reject("timeout");
-        clearInterval(intervalId);
-      }, 60000);
-      const intervalId = setInterval(() => {
-        if (!w.closed) return;
-        clearInterval(intervalId);
-        clearTimeout(timeoutId);
-        resolve();
-      }, 200);
-    });
+    await openWindow("/api/auth/authorize");
     await refresh();
-    // todo: login logic
   }, [refresh]);
 
   const logout = useCallback(async () => {
-    // todo: logout logic
-    await axios.get("/api/auth/logout");
+    await http.get("/auth/logout");
     await refresh();
   }, [refresh]);
 
@@ -90,7 +73,7 @@ export function UserContextProvider({
   );
 
   useEffect(() => {
-    refresh();
+    refresh().then();
   }, [refresh]);
 
   return (

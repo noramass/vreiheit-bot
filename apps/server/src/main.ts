@@ -61,7 +61,7 @@ export async function main(): Promise<Express> {
   // index fallback for non api routes
   // app.use("*", express.static(`${path}/index.html`));
   await nextApp.prepare();
-  app.use("*", nextApp.getRequestHandler());
+  app.use(nextApp.getRequestHandler());
 
   return app;
 }
