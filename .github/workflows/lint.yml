@@ -24,5 +24,5 @@ jobs:
           node-version: 18
       - name: install dependencies
         run: npm i -g pnpm && pnpm i --ignore-scripts
-      - name: lint apps/server
+      - name: lint packages
         run: pnpm run packages:lint
