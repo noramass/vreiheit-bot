@@ -1,5 +1,4 @@
 const { abs, round, sin, cos, atan2, max, min, pow, PI: pi } = Math;
-const taw = pi * 2;
 export function roundTo(n: number, digits = 8) {
   const factor = pow(10, digits);
   return round(n * factor) / factor;
