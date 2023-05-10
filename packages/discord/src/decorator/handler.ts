@@ -60,6 +60,7 @@ export function createDiscordServiceDecorator() {
           try {
             await handler(...params);
           } catch (e) {
+            // eslint-disable-next-line no-console
             console.error(e);
           }
       });
