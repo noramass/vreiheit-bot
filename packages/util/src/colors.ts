@@ -1,6 +1,6 @@
 import { clamp, clampR, roundTo } from "src/math";
 
-const { min, max, abs, round } = Math;
+const { min, max, abs } = Math;
 
 export interface RgbColorObject {
   r: number;

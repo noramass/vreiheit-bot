@@ -1,5 +1,4 @@
 import { ILike, Like } from "typeorm";
-import { escapeRegExp } from "typeorm/util/escapeRegExp";
 
 export function replaceLike(
   pattern: string,
