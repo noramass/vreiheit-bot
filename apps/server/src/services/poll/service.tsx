@@ -3,6 +3,7 @@ import { Poll, dataSource, defineProcedure, Safe } from "@vreiheit/database";
 import { chunks } from "@vreiheit/util";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 import { ButtonStyle, GuildTextBasedChannel } from "discord.js";
+import { Injectable } from "src/mount";
 import t from "src/services/poll/translations.json";
 import { getServer } from "src/util";
 import { Repository } from "typeorm";
@@ -24,7 +25,7 @@ export interface PollOptions {
 
 export type FullPollOptions = Required<PollOptions>;
 
-@Service("/poll")
+@Injectable()
 export class PollService {
   get repo(): Repository<Poll> {
     return dataSource.getRepository(Poll);

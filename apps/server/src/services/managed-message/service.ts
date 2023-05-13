@@ -1,7 +1,9 @@
 import { Param } from "@propero/easy-api";
 import { dataSource, ManagedMessage } from "@vreiheit/database";
+import { Injectable } from "src/mount";
 import { Repository } from "typeorm";
 
+@Injectable()
 export class ManagedMessageService {
   get repo(): Repository<ManagedMessage> {
     return dataSource.getRepository(ManagedMessage);

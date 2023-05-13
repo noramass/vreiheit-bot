@@ -14,14 +14,16 @@ import {
   GuildTextBasedChannel,
 } from "discord.js";
 import { lang } from "src/consts";
+import { Init, Inject } from "src/mount";
 import { ManagedMessageService } from "src/services";
 import { managedMessageCommand } from "src/services/managed-message/command";
 import t from "src/services/managed-message/translations.json";
 import { ILike, Repository } from "typeorm";
 
 @DiscordController("managed-message")
+@Init
 export class ManagedMessageDiscordController {
-  messageService!: ManagedMessageService;
+  @Inject(() => ManagedMessageService) messageService!: ManagedMessageService;
 
   get repo(): Repository<ManagedMessage> {
     return dataSource.getRepository(ManagedMessage);

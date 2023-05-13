@@ -21,13 +21,15 @@ import {
 } from "discord.js";
 import qs from "node:querystring";
 import { lang } from "src/consts";
+import { Init, Inject } from "src/mount";
 import { FullPollOptions, PollOptions, PollService } from "src/services";
 import { pollCommand } from "src/services/poll/command";
 import t from "src/services/poll/translations.json";
 
 @DiscordController("poll")
+@Init
 export class PollDiscordController {
-  pollService!: PollService;
+  @Inject(() => PollService) pollService!: PollService;
 
   @OnInit
   async onInit(client: Client<true>) {
