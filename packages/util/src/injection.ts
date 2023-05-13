@@ -40,7 +40,10 @@ export function createInjectionDecorators(
     registered.set(key, cache(factory));
   }
 
-  function Injectable({ initialise, factory }: InjectableOptions<any> = {}) {
+  function Injectable({
+    initialise = true,
+    factory,
+  }: InjectableOptions<any> = {}) {
     return function (Cls: any) {
       Cls = Init(Cls);
       if (initialise) factory = () => new Cls();
