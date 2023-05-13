@@ -2,7 +2,7 @@ module.exports = {
   $schema: "https://json.schemastore.org/eslintrc",
   root: true,
   parser: "@typescript-eslint/parser",
-  plugins: ["@typescript-eslint", "@html-eslint"],
+  plugins: ["@html-eslint", "@typescript-eslint"],
   env: {
     node: true,
   },
@@ -77,32 +77,6 @@ module.exports = {
       parser: "@html-eslint/parser",
       extends: ["plugin:@html-eslint/recommended"],
     },
-    /*{
-      files: ["*.css"],
-      extends: ["plugin:tailwindcss/recommended"],
-      rules: {
-        "prettier/prettier": [
-          "error",
-          {
-            arrowParens: "avoid",
-            bracketSameLine: true,
-            htmlWhitespaceSensitivity: "css",
-            proseWrap: "always",
-            singleQuote: false,
-            printWidth: 80,
-            plugins: [require("prettier-plugin-tailwindcss")],
-            semi: true,
-            tabWidth: 2,
-            useTabs: false,
-            jsxSingleQuote: false,
-            quoteProps: "consistent",
-            bracketSpacing: true,
-            endOfLine: "lf",
-            trailingComma: "all",
-          },
-        ],
-      },
-    },*/
   ],
   ignorePatterns: [
     "node_modules",

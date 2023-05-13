@@ -1,8 +1,7 @@
-﻿import { Service } from "@propero/easy-api";
-import { dataSource, ServerMember } from "@vreiheit/database";
+﻿import { dataSource, ServerMember } from "@vreiheit/database";
 import {
-  DiscordElements as React,
   DiscordController,
+  DiscordElements as React,
   OnMessageCreate,
   OnMessageDelete,
 } from "@vreiheit/discord";
@@ -10,8 +9,7 @@ import { Message } from "discord.js";
 import t from "./translations.json";
 
 @DiscordController()
-@Service()
-export class AltReminderService {
+export class AltReminderDiscordController {
   get users() {
     return dataSource.getRepository(ServerMember);
   }

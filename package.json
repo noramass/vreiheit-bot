@@ -6,7 +6,7 @@
   "scripts": {
     "packages:build": "pnpm run -r build",
     "packages:lint": "pnpm run -r lint",
-    "packages:dev": "pnpm run -r --parallel dev"
+    "packages:dev": "pnpm --filter \"@vreiheit/server...\" run -r build && pnpm run -r --filter \"@vreiheit/server\" dev"
   },
   "keywords": [],
   "author": "Nora Reichwald <nora@reichwald.me> (https://reichwald.me/)",

@@ -2,10 +2,9 @@
   "name": "@vreiheit/website",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite dev",
     "build": "vite build",
-    "lint": "eslint --ext .ts,.tsx,.html,.htm .",
-    "lint:fix": "eslint --fix --ext .ts,.tsx,.html,.htm ."
+    "start": "vite start"
   },
   "devDependencies": {
     "@fukumong/fantasticon": "^2.1.0",
