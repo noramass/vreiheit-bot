@@ -10,15 +10,11 @@ interface DiscordServiceMeta {
 export function createDiscordServiceDecorator() {
   const services: DiscordServiceMeta[] = [];
   function DiscordController(prefix?: string) {
-    return function <T>(cls: T): T {
+    return function <T>(cls: T): void {
       const meta = getDiscordMeta(cls);
       meta.prefix = prefix;
-      return class extends (cls as any) {
-        constructor(...args: any[]) {
-          super(...args);
-          services.push({ cls, instance: this, meta });
-        }
-      } as T;
+      const instance = new (cls as any)();
+      services.push({ cls, instance, meta });
     };
   }
 

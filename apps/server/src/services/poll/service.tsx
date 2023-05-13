@@ -66,7 +66,7 @@ export class PollService {
   async onInit(client: Client<true>) {
     await ensureCommand(client, pollCommand());
     for (const poll of await this.repo.find({ relations: ["guild"] }))
-      if (!poll.closed && poll.guild)
+      if (!poll.closed && client.guilds.cache.has(poll.guild?.discordId))
         await this.schedulePoll(poll.id, poll.conclusion);
   }
 
