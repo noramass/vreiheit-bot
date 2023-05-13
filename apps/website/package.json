@@ -2,8 +2,9 @@
   "name": "@vreiheit/website",
   "version": "0.0.0",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build"
+    "dev": "vite dev",
+    "build": "vite build",
+    "start": "vite start"
   },
   "devDependencies": {
     "@fukumong/fantasticon": "^2.1.0",
