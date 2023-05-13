@@ -23,13 +23,13 @@ export interface InjectionDecorators {
   Inject: InjectPropertyDecorator;
   register: (key: any, factory: () => any) => void;
   Init: InitDecorator;
+  withInit: <T extends (...any) => any>(decorator: T) => T;
 }
 
 function cache<T>(fn: () => T): () => T {
   let cached: T | undefined;
   return () => (cached ??= fn());
 }
-
 
 export function createInjectionDecorators(
   appendInit = true,
@@ -84,5 +84,13 @@ export function createInjectionDecorators(
     };
   }
 
-  return { Inject, Injectable, Init, register };
+  function withInit(decorator: any): any {
+    return function (...params) {
+      return function (Cls) {
+        return decorator(...params)(Init(Cls));
+      };
+    };
+  }
+
+  return { Inject, Injectable, Init, register, withInit };
 }
