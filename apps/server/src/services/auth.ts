@@ -1,4 +1,4 @@
-import { Get, Query, Req, Service, Session } from "@propero/easy-api";
+import { Get, Query, Req, Session } from "@propero/easy-api";
 import { dataSource, User } from "@vreiheit/database";
 import { env } from "@vreiheit/util";
 import * as crypto from "crypto";
@@ -9,7 +9,6 @@ import { HttpController } from "src/mount";
 import { Repository } from "typeorm";
 
 @HttpController("/auth")
-@Service()
 export class DiscordOAuth2 {
   get client_id() {
     return env("discord_client_id");
