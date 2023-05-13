@@ -33,7 +33,7 @@ export class PollDiscordController {
   async onInit(client: Client<true>) {
     await ensureCommand(client, pollCommand());
     for (const poll of await this.pollService.getAll())
-      if (!poll.closed && poll.guild)
+      if (!poll.closed && client.guilds.cache.has(poll.guild?.discordId))
         await this.pollService.schedulePoll(poll.id, poll.conclusion);
   }
 
@@ -47,7 +47,6 @@ export class PollDiscordController {
       options.map(option => ({ name: option.title, value: option.id })),
     );
   }
-
   @OnAutocomplete("poll", "timeframe")
   async onAutocompleteTimeframe(
     @DC.Interaction auto: AutocompleteInteraction,

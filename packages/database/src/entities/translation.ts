@@ -4,23 +4,20 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
 
 @Entity("translation")
 export class Translation {
-  @PrimaryGeneratedColumn("increment")
-  id!: number;
-
-  @Column("varchar")
+  @PrimaryColumn("varchar")
   key!: string;
 
-  @Column("varchar")
-  lang!: string;
+  @Column("varchar", { array: true })
+  tags: string[];
 
-  @Column("varchar")
-  text!: string;
+  @Column("jsonb")
+  translations!: Record<string, string>;
 
   @CreateDateColumn()
   createdAt!: Date;

@@ -1,13 +1,14 @@
-import { Get, Query, Req, Service, Session } from "@propero/easy-api";
+import { Get, Query, Req, Session } from "@propero/easy-api";
 import { dataSource, User } from "@vreiheit/database";
 import { env } from "@vreiheit/util";
 import * as crypto from "crypto";
 import qs from "qs";
 import axios from "axios";
 import { Request } from "express";
+import { HttpController } from "src/mount";
 import { Repository } from "typeorm";
 
-@Service("/auth")
+@HttpController("/auth")
 export class DiscordOAuth2 {
   get client_id() {
     return env("discord_client_id");
@@ -81,6 +82,11 @@ export class DiscordOAuth2 {
     });
     session.user = session.oauth2 = undefined;
     return { status: 200, data: { success: true } };
+  }
+
+  @Get("/me")
+  async me(@Session("user") user: any) {
+    return { data: { user } };
   }
 
   getRedirectUri(req: Request) {
