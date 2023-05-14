@@ -20,6 +20,9 @@ export function createDiscordServiceDecorator() {
 
   function applyServices(client: Client) {
     const map: Record<keyof DiscordHandlerMeta, keyof ClientEvents> = {
+      guildCreate: "guildCreate",
+      guildUpdate: "guildUpdate",
+      guildDelete: "guildDelete",
       banCreate: "guildBanAdd",
       banRemove: "guildBanRemove",
       messageCreate: "messageCreate",
@@ -28,12 +31,16 @@ export function createDiscordServiceDecorator() {
       roleCreate: "roleCreate",
       roleUpdate: "roleUpdate",
       roleDelete: "roleDelete",
+      channelCreate: "channelCreate",
+      channelUpdate: "channelUpdate",
+      channelDelete: "channelDelete",
       memberJoin: "guildMemberAdd",
       memberUpdate: "guildMemberUpdate",
       memberLeave: "guildMemberRemove",
       interaction: "interactionCreate",
       init: "ready",
       voiceStateUpdate: "voiceStateUpdate",
+      guildAuditLogEntryCreate: "guildAuditLogEntryCreate",
     };
 
     const allHandlers: Record<string, any[]> = {};

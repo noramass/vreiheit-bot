@@ -8,6 +8,10 @@ export interface DiscordMeta {
 }
 
 export interface DiscordHandlerMeta {
+  guildCreate: DiscordHandler<"guildCreate">[];
+  guildUpdate: DiscordHandler<"guildUpdate">[];
+  guildDelete: DiscordHandler<"guildDelete">[];
+
   interaction: DiscordHandler<"interactionCreate">[];
 
   memberJoin: DiscordHandler<"guildMemberAdd">[];
@@ -16,6 +20,10 @@ export interface DiscordHandlerMeta {
 
   banCreate: DiscordHandler<"guildBanAdd">[];
   banRemove: DiscordHandler<"guildBanRemove">[];
+
+  channelCreate: DiscordHandler<"channelCreate">[];
+  channelUpdate: DiscordHandler<"channelUpdate">[];
+  channelDelete: DiscordHandler<"channelDelete">[];
 
   roleCreate: DiscordHandler<"roleCreate">[];
   roleUpdate: DiscordHandler<"roleUpdate">[];
@@ -27,6 +35,7 @@ export interface DiscordHandlerMeta {
 
   init: DiscordHandler<"ready">[];
   voiceStateUpdate: DiscordHandler<"voiceStateUpdate">[];
+  guildAuditLogEntryCreate: DiscordHandler<"guildAuditLogEntryCreate">[];
 }
 
 export type DiscordHandler<Field extends keyof ClientEvents> = (options: {
@@ -44,6 +53,9 @@ export function getDiscordMeta(cls: any) {
 function createMeta(): DiscordMeta {
   return {
     handlers: {
+      guildCreate: [],
+      guildUpdate: [],
+      guildDelete: [],
       interaction: [],
       memberJoin: [],
       memberLeave: [],
@@ -53,11 +65,15 @@ function createMeta(): DiscordMeta {
       roleCreate: [],
       roleDelete: [],
       roleUpdate: [],
+      channelCreate: [],
+      channelUpdate: [],
+      channelDelete: [],
       messageCreate: [],
       messageDelete: [],
       messageUpdate: [],
       init: [],
       voiceStateUpdate: [],
+      guildAuditLogEntryCreate: [],
     },
   };
 }

@@ -80,6 +80,9 @@ export class Server {
   @Column("varchar", { nullable: true })
   voiceCategoryId!: string;
 
+  @Column("timestamp", { nullable: true })
+  leftAt?: Date;
+
   @CreateDateColumn()
   createdAt!: Date;
 

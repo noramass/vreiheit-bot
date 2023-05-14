@@ -6,6 +6,10 @@ import {
   DiscordHandlerParams,
 } from "src/util";
 
+export const OnGuildCreate = basicDecorator("guildCreate");
+export const OnGuildUpdate = basicDecorator("guildUpdate");
+export const OnGuildDelete = basicDecorator("guildDelete");
+
 export const OnVoiceStateUpdate = basicDecorator("voiceStateUpdate");
 
 export const OnMemberJoin = basicDecorator("memberJoin");
@@ -24,6 +28,9 @@ export const OnBanCreate = basicDecorator("banCreate");
 export const OnBanRemove = basicDecorator("banRemove");
 
 export const OnInit = basicDecorator("init");
+export const OnGuildAuditLogEntryCreate = basicDecorator(
+  "guildAuditLogEntryCreate",
+);
 
 function basicDecorator<Field extends keyof DiscordHandlerMeta>(field: Field) {
   return function (
