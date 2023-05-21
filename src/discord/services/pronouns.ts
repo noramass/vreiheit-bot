@@ -62,11 +62,16 @@ export class Pronouns {
       name: this.prefix("Any"),
       color: "#71cb9f",
     },
+    "none": {
+      name: this.prefix("None/Name"),
+      color: "#86dcae",
+    },
     "ask": {
       name: this.prefix("Nachfragen"),
       color: "#86efac",
     },
   } as const;
+
   pronounRolesShared = {
     permissions: [],
     mentionable: false,
@@ -173,13 +178,15 @@ export class Pronouns {
 
   @OnFormSubmit("add")
   async onCustomPronounsSubmit(form: ModalSubmitInteraction) {
-    const color =
+    let color =
       form.fields.getField("color", ComponentType.TextInput).value || "#86efac";
     const name = form.fields.getField("name", ComponentType.TextInput).value;
     if (!name || name.length > 20)
-      return await form.reply("Ungültige Pronomen");
-    if (!/^#[0-9a-fA-F]{6}$/.test(color))
-      return await form.reply("Ungültiger Farbcode");
+      return await form.reply({
+        ephemeral: true,
+        content: "Ungültige Pronomen",
+      });
+    if (!/^#[0-9a-fA-F]{6}$/.test(color)) color = "#86efac";
     await form.deferUpdate();
     await this.createCustomPronounRole(
       form.member as GuildMember,
