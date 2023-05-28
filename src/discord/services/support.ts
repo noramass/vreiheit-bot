@@ -390,10 +390,11 @@ Ich habe einen Fehler gefunden...`),
       embeds: [new EmbedBuilder().setDescription("Ticket wird erstellt...")],
     });
     await this.updateTicketStatus(thread, ticket);
-    if (!isMod)
-      await thread.send({
-        content: `Bitte beschreibe deine Problematik so genau wie möglich. Jemand aus der <@&${modRoleId}> wird sich bald um dich kümmern.`,
-      });
+    await thread.send({
+      content: isMod
+        ? `<@${ticket.author.discordId}> bitte füge eine Person mit \`support assign\` hinzu.`
+        : `Bitte beschreibe deine Problematik so genau wie möglich. Jemand aus der <@&${modRoleId}> wird sich bald um dich kümmern.`,
+    });
   }
 
   async setupThreadPermissions(ticket: SupportTicket, thread: TextChannel) {
