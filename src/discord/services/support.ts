@@ -18,6 +18,7 @@ import {
   EmbedBuilder,
   GuildTextBasedChannel,
   UserResolvable,
+  GuildMemberRoleManager,
 } from "discord.js";
 import { dataSource, withResource } from "src/database/data-source";
 import { Server } from "src/database/entities/server";
@@ -313,11 +314,15 @@ Ich habe einen Fehler gefunden...`),
     const server = await getServer(guild.id);
     const member = await getServerMember(user as any);
 
+    const isMod = (user.roles as GuildMemberRoleManager).cache.has(
+      server.modRoleId,
+    );
+
     const ticketCount = await repo.countBy({
       author: { discordId: form.member.user.id },
       status: "open",
     });
-    if (ticketCount > this.personalLimit)
+    if (ticketCount > this.personalLimit && !isMod)
       return await form.editReply({
         content: `Du kannst nicht mehr als ${this.personalLimit} Support Anfragen gleichzeitig eröffnen.`,
       });
@@ -326,7 +331,7 @@ Ich habe einen Fehler gefunden...`),
       guild: { discordId: form.guildId },
       status: "open",
     });
-    if (totalCount > this.serverLimit)
+    if (totalCount > this.serverLimit && !isMod)
       return form.editReply({
         content: `Es sind bereits zu viele Supportanfragen offen! Bitte lasse dir etwas Zeit oder wende dich direkt an die Moderation.`,
       });
@@ -338,7 +343,7 @@ Ich habe einen Fehler gefunden...`),
       description,
     });
     await repo.save(ticket);
-    await this.populateSupportTicket(ticket, guild, user as any);
+    await this.populateSupportTicket(ticket, guild, user as any, isMod);
     await repo.save(ticket);
     await form.editReply({ content: "Support Ticket wurde angelegt!" });
     await sleep(5000);
@@ -349,15 +354,17 @@ Ich habe einen Fehler gefunden...`),
     ticket: SupportTicket,
     guild: Guild,
     member: GuildMember,
+    isMod: boolean,
   ) {
     const channel = await guild.channels.fetch(ticket.guild.supportChannelId);
-    return this.createTextChannel(ticket, channel as any, member);
+    return this.createTextChannel(ticket, channel as any, member, isMod);
   }
 
   async createTextChannel(
     ticket: SupportTicket,
     channel: CategoryChannel,
     member: GuildMember,
+    isMod: boolean,
   ) {
     const thread = await channel.children.create({
       type: ChannelType.GuildText,
@@ -368,20 +375,25 @@ Ich habe einen Fehler gefunden...`),
       )}`,
       permissionOverwrites: [],
     });
-    await this.initialiseSupportTicket(ticket, thread);
+    await this.initialiseSupportTicket(ticket, thread, isMod);
     ticket.channelId = thread.id;
   }
 
-  async initialiseSupportTicket(ticket: SupportTicket, thread: TextChannel) {
+  async initialiseSupportTicket(
+    ticket: SupportTicket,
+    thread: TextChannel,
+    isMod: boolean,
+  ) {
     const { modRoleId } = ticket.guild;
     await this.setupThreadPermissions(ticket, thread);
     await thread.send({
       embeds: [new EmbedBuilder().setDescription("Ticket wird erstellt...")],
     });
     await this.updateTicketStatus(thread, ticket);
-    await thread.send({
-      content: `Bitte beschreibe deine Problematik so genau wie möglich. Jemand aus der <@&${modRoleId}> wird sich bald um dich kümmern.`,
-    });
+    if (!isMod)
+      await thread.send({
+        content: `Bitte beschreibe deine Problematik so genau wie möglich. Jemand aus der <@&${modRoleId}> wird sich bald um dich kümmern.`,
+      });
   }
 
   async setupThreadPermissions(ticket: SupportTicket, thread: TextChannel) {
