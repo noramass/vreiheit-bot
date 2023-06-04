@@ -3,13 +3,23 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
+  ChatInputCommandInteraction,
+  Client,
   Guild,
   GuildMember,
   GuildTextBasedChannel,
   Message,
+  SlashCommandBuilder,
   VoiceState,
 } from "discord.js";
-import { Handler, OnButton, OnVoiceStateUpdate } from "src/discord/decorators";
+import { ensureCommand } from "src/discord/commands/ensure-command";
+import {
+  Handler,
+  OnButton,
+  OnCommand,
+  OnInit,
+  OnVoiceStateUpdate,
+} from "src/discord/decorators";
 
 interface ActiveProcess {
   user: string;
@@ -26,6 +36,39 @@ export class Verification {
 
   activeProcess?: ActiveProcess;
   lastUserId?: string;
+
+  @OnInit()
+  async onInit(client: Client<true>) {
+    await ensureCommand(
+      client,
+      new SlashCommandBuilder()
+        .setName("verify")
+        .setDescription("Verifiziere ein Servermitglied")
+        .setDMPermission(false)
+        .addUserOption(opt =>
+          opt
+            .setName("user")
+            .setDescription("Das zu verifizierende Servermitglied")
+            .setRequired(true),
+        ),
+    );
+  }
+
+  @OnCommand("verify")
+  async onCmdVerify(cmd: ChatInputCommandInteraction) {
+    if (!(cmd.member as GuildMember).roles.cache.has(this.verificationRoleId))
+      return cmd.editReply({
+        content: `Nur eine Person aus der <@&${this.verificationRoleId}> kann personen verifizieren.`,
+      });
+    const member = cmd.options.getMember("user") as GuildMember;
+    await member.roles.add(this.verifiedRoleId);
+    const channel = await this.getTextChannel(cmd.guild);
+    await channel.send({
+      content: `<@${this.activeProcess.user}> wurde durch <@${this.activeProcess.verifier}> verifiziert.`,
+      components: [],
+    });
+    return cmd.deleteReply();
+  }
 
   @OnVoiceStateUpdate()
   async onVoiceStatusUpdate(oldState: VoiceState, newState: VoiceState) {
