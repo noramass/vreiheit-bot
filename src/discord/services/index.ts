@@ -14,3 +14,4 @@ export * from "./support";
 export * from "./interests";
 export * from "./suspicious-accounts";
 export * from "./autovoice";
+export * from "./verification";
