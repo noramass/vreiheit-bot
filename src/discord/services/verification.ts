@@ -25,11 +25,13 @@ export class Verification {
   voiceId = "1114995895344304219";
 
   activeProcess?: ActiveProcess;
+  lastUserId?: string;
 
   @OnVoiceStateUpdate()
   async onVoiceStatusUpdate(oldState: VoiceState, newState: VoiceState) {
     if (oldState.channelId === newState.channelId) return;
     if (newState.channelId !== this.voiceId) return;
+    if (this.lastUserId === newState.member.user.id) return;
     const roles = newState.member.roles;
     if (roles.cache.has(this.verifiedRoleId)) return;
     if (roles.cache.has(this.verificationRoleId))
@@ -43,6 +45,7 @@ export class Verification {
       content: `<@&${this.verificationRoleId}>: ${member} möchte verifiziert werden 🎉\nBitte betrete <#${this.voiceId}> um den Prozess zu starten.`,
     });
     this.activeProcess = { user: member.user.id, message };
+    this.lastUserId = member.user.id;
   }
 
   async onVerificationStarted(member: GuildMember) {
@@ -56,6 +59,10 @@ export class Verification {
             .setStyle(ButtonStyle.Primary)
             .setLabel("Verifizieren")
             .setCustomId("verification:accept"),
+          new ButtonBuilder()
+            .setStyle(ButtonStyle.Secondary)
+            .setLabel("Unsicher")
+            .setCustomId("verification:abort"),
           new ButtonBuilder()
             .setStyle(ButtonStyle.Danger)
             .setLabel("Ablehnen")
@@ -83,9 +90,30 @@ export class Verification {
       .roles.add(this.verifiedRoleId);
     await this.activeProcess.message.edit({
       content: `<@${this.activeProcess.user}> wurde durch <@${this.activeProcess.verifier}> verifiziert.`,
+      components: [],
     });
     this.activeProcess = undefined;
     await btn.deleteReply();
+  }
+
+  @OnButton("abort")
+  async onAbort(btn: ButtonInteraction) {
+    if (!this.activeProcess)
+      return btn.reply({
+        content: "Es ist keine Verifikation aktiv",
+        ephemeral: true,
+      });
+    if (btn.member.user.id !== this.activeProcess.verifier)
+      return btn.reply({
+        content: `Nur <@${this.activeProcess.verifier}> kann dies tun.`,
+        ephemeral: true,
+      });
+    await btn.deferReply({ ephemeral: true });
+    await this.activeProcess.message.edit({
+      content: `Die Verifizierung von <@${this.activeProcess.user}> wurde durch <@${this.activeProcess.verifier}> abgebrochen.`,
+      components: [],
+    });
+    this.activeProcess = undefined;
   }
 
   @OnButton("reject")
@@ -102,7 +130,8 @@ export class Verification {
       });
     await btn.deferReply({ ephemeral: true });
     await this.activeProcess.message.edit({
-      content: `Die Verifizierung von <@${this.activeProcess.user}> wurde durch <@${this.activeProcess.verifier}> abgelehnt oder abgebrochen.`,
+      content: `Die Verifizierung von <@${this.activeProcess.user}> wurde von <@${this.activeProcess.verifier}> abgelehnt.`,
+      components: [],
     });
     this.activeProcess = undefined;
   }
