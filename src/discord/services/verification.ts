@@ -114,6 +114,7 @@ export class Verification {
       components: [],
     });
     this.activeProcess = undefined;
+    await btn.deleteReply();
   }
 
   @OnButton("reject")
@@ -134,6 +135,7 @@ export class Verification {
       components: [],
     });
     this.activeProcess = undefined;
+    await btn.deleteReply();
   }
 
   _mentionChannel?: GuildTextBasedChannel;
