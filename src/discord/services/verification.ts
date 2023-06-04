@@ -33,9 +33,9 @@ export class Verification {
     if (newState.channelId !== this.voiceId) return;
     if (this.lastUserId === newState.member.user.id) return;
     const roles = newState.member.roles;
-    if (roles.cache.has(this.verifiedRoleId)) return;
     if (roles.cache.has(this.verificationRoleId))
       return this.onVerificationStarted(newState.member);
+    if (roles.cache.has(this.verifiedRoleId)) return;
     else return this.onVerificationRequested(newState.member);
   }
 
