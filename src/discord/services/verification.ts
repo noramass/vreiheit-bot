@@ -64,8 +64,7 @@ export class Verification {
     await member.roles.add(this.verifiedRoleId);
     const channel = await this.getTextChannel(cmd.guild);
     await channel.send({
-      content: `<@${member}> wurde durch <@${cmd.member}> verifiziert.`,
-      components: [],
+      content: `${member} wurde durch ${cmd.member} verifiziert.`,
     });
     return cmd.deleteReply();
   }
