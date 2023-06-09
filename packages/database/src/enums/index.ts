@@ -17,3 +17,8 @@ export * from "./discord-video-quality-mode";
 export * from "./discord-guild-member-flag";
 export * from "./discord-user-flag";
 export * from "./discord-user-premium-type";
+export * from "./discord-sticker-format-type";
+export * from "./discord-interaction-type";
+export * from "./discord-message-activity-type";
+export * from "./discord-message-flag";
+export * from "./discord-message-type";

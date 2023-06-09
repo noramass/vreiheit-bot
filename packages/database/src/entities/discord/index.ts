@@ -6,3 +6,4 @@ export * from "./discord-guild-member";
 export * from "./discord-permission-overwrite";
 export * from "./discord-role";
 export * from "./discord-user";
+export * from "./discord-message";

@@ -2,6 +2,7 @@ import { DiscordChannel } from "src/entities/discord/discord-channel";
 import { DiscordGuild } from "src/entities/discord/discord-guild";
 import { DiscordPermissionOverwrite } from "src/entities/discord/discord-permission-overwrite";
 import { DiscordRole } from "src/entities/discord/discord-role";
+import { DiscordSticker } from "src/entities/discord/discord-sticker";
 import { DiscordUser } from "src/entities/discord/discord-user";
 import { DiscordGuildMemberFlag } from "src/enums/discord-guild-member-flag";
 import { Flags } from "src/transformers/flag";
@@ -83,4 +84,7 @@ export class DiscordGuildMember extends BaseEntity {
 
   @OneToMany(() => DiscordChannel, channel => channel.owner)
   ownedChannels: DiscordChannel[];
+
+  @OneToMany(() => DiscordSticker, sticker => sticker.uploadedBy)
+  uploadedStickers: DiscordSticker[];
 }

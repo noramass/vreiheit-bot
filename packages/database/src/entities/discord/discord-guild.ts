@@ -3,6 +3,7 @@ import { DiscordEmoji } from "src/entities/discord/discord-emoji";
 import { DiscordGuildMember } from "src/entities/discord/discord-guild-member";
 import { DiscordPermissionOverwrite } from "src/entities/discord/discord-permission-overwrite";
 import { DiscordRole } from "src/entities/discord/discord-role";
+import { DiscordSticker } from "src/entities/discord/discord-sticker";
 import { DiscordUser } from "src/entities/discord/discord-user";
 import { DiscordDefaultMessageNotificationLevel } from "src/enums/discord-default-message-notification-level";
 import { DiscordExplicitContentFilterLevel } from "src/enums/discord-explicit-content-filter-level";
@@ -94,4 +95,7 @@ export class DiscordGuild extends BaseEntity {
 
   @OneToMany(() => DiscordPermissionOverwrite, overwrite => overwrite.guild)
   permissionOverwrites: DiscordPermissionOverwrite[];
+
+  @OneToMany(() => DiscordSticker, sticker => sticker.guild)
+  stickers: DiscordSticker[];
 }
