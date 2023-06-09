@@ -1,4 +1,4 @@
-export enum SystemChannelFlag {
+export enum DiscordSystemChannelFlag {
   SuppressJoinNotifications = 1 << 0,
   SuppressPremiumSubscriptions = 1 << 1,
   SuppressGuildReminderNotifications = 1 << 2,

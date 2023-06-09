@@ -1,4 +1,4 @@
-export enum Locale {
+export enum DiscordLocale {
   /** Indonesian */
   Indonesian = "id",
   /** Danish */

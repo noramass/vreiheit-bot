@@ -1,4 +1,4 @@
-export enum ExplicitContentFilterLevel {
+export enum DiscordExplicitContentFilterLevel {
   /** media content will not be scanned */
   Disabled = 0,
   /** media content sent by members without roles will be scanned */

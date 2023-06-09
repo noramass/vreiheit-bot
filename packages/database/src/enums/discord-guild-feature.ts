@@ -1,4 +1,4 @@
-export enum GuildFeature {
+export enum DiscordGuildFeature {
   /** guild has access to set an animated guild banner image */
   AnimatedBanner = "ANIMATED_BANNER",
   /** guild has access to set an animated guild icon */

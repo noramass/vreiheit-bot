@@ -1,7 +1,7 @@
 import { DiscordGuild } from "src/entities/discord/discord-guild";
 import { DiscordGuildMember } from "src/entities/discord/discord-guild-member";
 import { DiscordPermissionOverwrite } from "src/entities/discord/discord-permission-overwrite";
-import { PermissionFlag } from "src/enums/permission-flag";
+import { DiscordPermissionFlag } from "src/enums/discord-permission-flag";
 import { color } from "src/transformers/color";
 import { Flags } from "src/transformers/flag";
 import {
@@ -47,7 +47,7 @@ export class DiscordRole extends BaseEntity {
   position: number;
 
   @Column("int64", { transformer: Flags.transformer(true) })
-  permissions: Flags<PermissionFlag>;
+  permissions: Flags<DiscordPermissionFlag>;
 
   @Column("bool")
   managed: boolean;

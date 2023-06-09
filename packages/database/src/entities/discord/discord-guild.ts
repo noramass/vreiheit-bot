@@ -4,15 +4,15 @@ import { DiscordGuildMember } from "src/entities/discord/discord-guild-member";
 import { DiscordPermissionOverwrite } from "src/entities/discord/discord-permission-overwrite";
 import { DiscordRole } from "src/entities/discord/discord-role";
 import { DiscordUser } from "src/entities/discord/discord-user";
-import { DefaultMessageNotificationLevel } from "src/enums/default-message-notification-level";
-import { ExplicitContentFilterLevel } from "src/enums/explicit-content-filter-level";
-import { GuildFeature } from "src/enums/guild-feature";
-import { Locale } from "src/enums/locale";
-import { MFALevel } from "src/enums/mfa-level";
-import { PermissionFlag } from "src/enums/permission-flag";
-import { PremiumTier } from "src/enums/premium-tier";
-import { SystemChannelFlag } from "src/enums/system-channel-flag";
-import { VerificationLevel } from "src/enums/verification-level";
+import { DiscordDefaultMessageNotificationLevel } from "src/enums/discord-default-message-notification-level";
+import { DiscordExplicitContentFilterLevel } from "src/enums/discord-explicit-content-filter-level";
+import { DiscordGuildFeature } from "src/enums/discord-guild-feature";
+import { DiscordLocale } from "src/enums/discord-locale";
+import { DiscordMfaLevel } from "src/enums/discord-mfa-level";
+import { DiscordPermissionFlag } from "src/enums/discord-permission-flag";
+import { DiscordGuildPremiumTier } from "src/enums/discord-guild-premium-tier";
+import { DiscordSystemChannelFlag } from "src/enums/discord-system-channel-flag";
+import { DiscordVerificationLevel } from "src/enums/discord-verification-level";
 import { Flags } from "src/transformers/flag";
 import {
   BaseEntity,
@@ -53,32 +53,32 @@ export class DiscordGuild extends BaseEntity {
   @Column("varchar", { nullable: true })
   region?: string;
 
-  @EnumColumn(Locale, { nullable: true })
-  preferredLocale?: Locale;
+  @EnumColumn({ DiscordLocale }, { nullable: true })
+  preferredLocale?: DiscordLocale;
 
-  @EnumColumn(VerificationLevel)
-  verificationLevel: VerificationLevel;
+  @EnumColumn({ DiscordVerificationLevel })
+  verificationLevel: DiscordVerificationLevel;
 
-  @EnumColumn(GuildFeature, { array: true })
-  features: GuildFeature[];
+  @EnumColumn({ DiscordGuildFeature }, { array: true })
+  features: DiscordGuildFeature[];
 
-  @EnumColumn(DefaultMessageNotificationLevel)
-  defaultMessageNotificationLevel: DefaultMessageNotificationLevel;
+  @EnumColumn({ DiscordDefaultMessageNotificationLevel })
+  defaultMessageNotificationLevel: DiscordDefaultMessageNotificationLevel;
 
-  @EnumColumn(MFALevel)
-  mfaLevel: MFALevel;
+  @EnumColumn({ DiscordMfaLevel })
+  mfaLevel: DiscordMfaLevel;
 
-  @EnumColumn(ExplicitContentFilterLevel)
-  explicitContentFilterLevel: ExplicitContentFilterLevel;
+  @EnumColumn({ DiscordExplicitContentFilterLevel })
+  explicitContentFilterLevel: DiscordExplicitContentFilterLevel;
 
-  @EnumColumn(PremiumTier)
-  premiumTier: PremiumTier;
+  @EnumColumn({ DiscordPremiumTier: DiscordGuildPremiumTier })
+  premiumTier: DiscordGuildPremiumTier;
 
   @Column("int", { transformer: Flags.transformer() })
-  systemChannelFlags: Flags<SystemChannelFlag>;
+  systemChannelFlags: Flags<DiscordSystemChannelFlag>;
 
   @Column("varchar", { transformer: Flags.transformer(true) })
-  botPermissions: Flags<PermissionFlag>;
+  botPermissions: Flags<DiscordPermissionFlag>;
 
   @OneToMany(() => DiscordEmoji, emoji => emoji.guild)
   emojis: DiscordEmoji[];

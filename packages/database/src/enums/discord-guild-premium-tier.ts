@@ -1,4 +1,4 @@
-export enum PremiumTier {
+export enum DiscordGuildPremiumTier {
   None = 0,
   Tier1 = 1,
   Tier2 = 2,

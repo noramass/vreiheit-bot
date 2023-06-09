@@ -1,6 +1,6 @@
 import { ConstEnum } from "src/util/enum";
 
-export const PermissionFlag = {
+export const DiscordPermissionFlag = {
   /** Allows creation of instant invites */
   CreateInstantInvite: 1n,
   /** Allows kicking members */
@@ -93,6 +93,6 @@ export const PermissionFlag = {
   SendVoiceMessages: 70368744177664n,
 } as const;
 
-Object.freeze(PermissionFlag);
+Object.freeze(DiscordPermissionFlag);
 
-export type PermissionFlag = ConstEnum<typeof PermissionFlag>;
+export type DiscordPermissionFlag = ConstEnum<typeof DiscordPermissionFlag>;

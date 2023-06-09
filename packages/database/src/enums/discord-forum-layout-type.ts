@@ -1,4 +1,4 @@
-export enum ForumLayoutType {
+export enum DiscordForumLayoutType {
   /** No default has been set for forum channel */
   NotSet = 0,
   /** Display posts as a list */

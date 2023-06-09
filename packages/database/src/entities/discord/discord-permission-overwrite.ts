@@ -3,8 +3,8 @@ import { DiscordChannel } from "src/entities/discord/discord-channel";
 import { DiscordGuild } from "src/entities/discord/discord-guild";
 import { DiscordGuildMember } from "src/entities/discord/discord-guild-member";
 import { DiscordRole } from "src/entities/discord/discord-role";
-import { PermissionFlag } from "src/enums";
-import { OverwriteType } from "src/enums/overwrite-type";
+import { DiscordPermissionFlag } from "src/enums";
+import { DiscordOverwriteType } from "src/enums/discord-overwrite-type";
 import { Flags } from "src/transformers/flag";
 import {
   BaseEntity,
@@ -24,14 +24,14 @@ export class DiscordPermissionOverwrite extends BaseEntity {
   @PrimaryColumn("varchar")
   channelId: string;
 
-  @EnumColumn(OverwriteType)
-  type: OverwriteType;
+  @EnumColumn({ DiscordOverwriteType })
+  type: DiscordOverwriteType;
 
   @Column("varchar", { transformer: Flags.transformer(true) })
-  allow: Flags<PermissionFlag>;
+  allow: Flags<DiscordPermissionFlag>;
 
   @Column("varchar", { transformer: Flags.transformer(true) })
-  deny: Flags<PermissionFlag>;
+  deny: Flags<DiscordPermissionFlag>;
 
   @ManyToOne(() => DiscordGuild, guild => guild.permissionOverwrites)
   @JoinColumn({ name: "guildId" })

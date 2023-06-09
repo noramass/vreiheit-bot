@@ -1,4 +1,4 @@
-export enum SortOrderType {
+export enum DiscordSortOrderType {
   /** Sort forum posts by activity */
   LatestActivity = 0,
   /** Sort forum posts by creation time (from most recent to oldest) */

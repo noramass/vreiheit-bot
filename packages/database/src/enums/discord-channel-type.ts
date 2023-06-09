@@ -1,4 +1,4 @@
-export enum ChannelType {
+export enum DiscordChannelType {
   /** a text channel within a server */
   GuildText = 0,
   /** a direct message between users */

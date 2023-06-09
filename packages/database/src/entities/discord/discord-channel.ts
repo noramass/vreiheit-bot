@@ -2,12 +2,12 @@ import { EnumColumn } from "src/decorators/enum";
 import { DiscordGuildMember } from "src/entities/discord/discord-guild-member";
 import { DiscordPermissionOverwrite } from "src/entities/discord/discord-permission-overwrite";
 import {
-  ChannelFlag,
-  ChannelType,
-  ForumLayoutType,
-  PermissionFlag,
-  SortOrderType,
-  VideoQualityMode,
+  DiscordChannelFlag,
+  DiscordChannelType,
+  DiscordForumLayoutType,
+  DiscordPermissionFlag,
+  DiscordSortOrderType,
+  DiscordVideoQualityMode,
 } from "src/enums";
 import { Flags } from "src/transformers/flag";
 import {
@@ -53,7 +53,7 @@ export class DiscordChannel extends BaseEntity {
   totalMessagesSent?: number;
 
   @Column("jsonb", { nullable: true })
-  threadMetadata?: ThreadMetadata;
+  threadMetadata?: DiscordThreadMetadata;
 
   @Column("int", { nullable: true })
   defaultAutoArchiveDuration?: number;
@@ -62,31 +62,36 @@ export class DiscordChannel extends BaseEntity {
   defaultThreadRateLimitPerUser?: number;
 
   @Column("jsonb", { nullable: true })
-  availableTags?: ForumTagObject[];
+  availableTags?: DiscordForumTagObject[];
 
   @Column("jsonb", { nullable: true })
-  appliedTags?: ForumTagObject[];
+  appliedTags?: DiscordForumTagObject[];
 
   @Column("jsonb", { nullable: true })
-  defaultReactionEmoji: DefaultReaction;
+  defaultReactionEmoji: DiscordDefaultReaction;
 
   @Column("varchar", { transformer: Flags.transformer(true), nullable: true })
-  permissions?: Flags<PermissionFlag>;
+  permissions?: Flags<DiscordPermissionFlag>;
 
   @Column("int", { transformer: Flags.transformer(), nullable: true })
-  flags?: Flags<ChannelFlag>;
+  flags?: Flags<DiscordChannelFlag>;
 
-  @EnumColumn(ChannelType)
-  channelType: ChannelType;
+  @EnumColumn({ DiscordChannelType })
+  channelType: DiscordChannelType;
 
-  @EnumColumn(VideoQualityMode, { default: VideoQualityMode.Auto })
-  videoQualityMode: VideoQualityMode;
+  @EnumColumn(
+    { DiscordVideoQualityMode },
+    {
+      default: DiscordVideoQualityMode.Auto,
+    },
+  )
+  videoQualityMode: DiscordVideoQualityMode;
 
-  @EnumColumn(SortOrderType, { nullable: true })
-  defaultSortOrder?: SortOrderType;
+  @EnumColumn({ DiscordSortOrderType }, { nullable: true })
+  defaultSortOrder?: DiscordSortOrderType;
 
-  @EnumColumn(ForumLayoutType, { nullable: true })
-  defaultForumLayout?: ForumLayoutType;
+  @EnumColumn({ DiscordForumLayoutType }, { nullable: true })
+  defaultForumLayout?: DiscordForumLayoutType;
 
   @OneToMany(() => DiscordPermissionOverwrite, overwrite => overwrite.channel)
   permissionOverwrites: DiscordPermissionOverwrite[];
@@ -105,7 +110,7 @@ export class DiscordChannel extends BaseEntity {
   children: DiscordChannel[];
 }
 
-interface ForumTagObject {
+interface DiscordForumTagObject {
   id: string;
   name: string;
   moderated: boolean;
@@ -113,12 +118,12 @@ interface ForumTagObject {
   emoji_name?: string;
 }
 
-interface DefaultReaction {
+interface DiscordDefaultReaction {
   emoji_id?: string;
   emoji_name?: string;
 }
 
-interface ThreadMetadata {
+interface DiscordThreadMetadata {
   archived: boolean;
   auto_archive_duration: boolean;
   archive_timestamp: string;

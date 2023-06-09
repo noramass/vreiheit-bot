@@ -1,4 +1,4 @@
-export enum VerificationLevel {
+export enum DiscordVerificationLevel {
   /** unrestricted */
   None = 0,
   /** must have account */
