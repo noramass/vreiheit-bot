@@ -234,7 +234,7 @@ export class Verification {
       "",
       "**Achtung**: die Person ist als verdächtig markiert.",
       `Eine Person aus der <@&${this.moderationRoleId}> sollte sich darum kümmern.`,
-      `Mehr infos in <#${data.suspectThreadId}>!`,
+      `Mehr Infos in <#${data.suspectThreadId}>!`,
     ].join("\n");
   }
 
