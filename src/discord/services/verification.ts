@@ -228,13 +228,14 @@ export class Verification {
 
   async message(member: GuildMember, text: string | string[]) {
     const data = await getServerMember(member);
-    if (!data.suspect) return "";
+    if (!data.suspect) return (Array.isArray(text) ? text : [text]).join("\n");
     return [
       ...(Array.isArray(text) ? text : [text]),
+      "",
       "**Achtung**: die Person ist als verdächtig markiert.",
       `Eine Person aus der <@&${this.moderationRoleId}> sollte sich darum kümmern.`,
       `Mehr infos in <#${data.suspectThreadId}>!`,
-    ].join("");
+    ].join("\n");
   }
 
   _mentionChannel?: GuildTextBasedChannel;
