@@ -4,3 +4,12 @@
 
 .env.local
 .env.*.local
+
+.idea
+.vscode
+
+apps/*/dist
+apps/*/node_modules
+apps/*/.next
+packages/*/dist
+packages/*/node_modules
