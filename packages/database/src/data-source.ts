@@ -1,4 +1,5 @@
-import "src/shims";
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="./shims.d.ts" />
 import * as entities from "./entities";
 import { env, isDev, PromiseOr } from "@vreiheit/util";
 import { TogglePollChoice1680779710292 } from "./migrations/1680779710292-toggle-poll-choice";
