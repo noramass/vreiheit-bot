@@ -142,7 +142,8 @@ export class Verification {
   async onVerificationStarted(member: GuildMember) {
     if (!this.activeProcess) return;
     this.activeProcess.verifier = member.user.id;
-    const content = await this.message(member, [
+    const user = await member.guild.members.cache.get(this.activeProcess.user);
+    const content = await this.message(user, [
       `<@${this.activeProcess.user}> wird durch <@${this.activeProcess.verifier}> verifiziert.`,
     ]);
     await this.activeProcess.message.edit({
@@ -165,7 +166,7 @@ export class Verification {
       ],
     });
     await this.activeProcess.message.startThread({
-      name: `Protokoll zu <@${this.activeProcess.user}>`,
+      name: `Protokoll zu ${user.displayName}`,
       autoArchiveDuration: 60,
     });
   }
