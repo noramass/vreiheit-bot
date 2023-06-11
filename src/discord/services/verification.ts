@@ -5,11 +5,13 @@ import {
   ButtonStyle,
   ChatInputCommandInteraction,
   Client,
+  Collection,
   Guild,
   GuildMember,
   GuildTextBasedChannel,
   Message,
   SlashCommandBuilder,
+  Snowflake,
   VoiceState,
 } from "discord.js";
 import { ensureCommand } from "src/discord/commands/ensure-command";
@@ -242,7 +244,9 @@ export class Verification {
       : ((await guild.channels.fetch(this.textId))! as any));
   }
 
-  async getVoiceChannelMembers(guild: Guild) {
+  async getVoiceChannelMembers(
+    guild: Guild,
+  ): Promise<Collection<Snowflake, GuildMember>> {
     const channel = await guild.channels.fetch(this.voiceId);
     if (!channel.isVoiceBased()) throw new Error("voice errors");
     return channel.members;
