@@ -1,4 +1,4 @@
-export enum DiscordAuditLogEvent {
+export enum DiscordAuditLogEventType {
   /** Server settings were updated */
   GuildUpdate = 1,
   /** Channel was created */

@@ -1,7 +1,8 @@
 import { EnumColumn } from "src/decorators/enum";
-import { DiscordAuditLogEvent } from "src/enums";
-import { BaseEntity, Column, PrimaryColumn } from "typeorm";
+import { DiscordAuditLogEventType } from "src/enums";
+import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 
+@Entity("AuditLogEntry", { schema: "discord" })
 export class DiscordAuditLogEntry extends BaseEntity {
   @PrimaryColumn("varchar")
   id: string;
@@ -15,8 +16,8 @@ export class DiscordAuditLogEntry extends BaseEntity {
   @Column("varchar")
   reason?: string;
 
-  @EnumColumn({ DiscordAuditLogEvent })
-  actionType: DiscordAuditLogEvent;
+  @EnumColumn({ DiscordAuditLogEventType })
+  actionType: DiscordAuditLogEventType;
 
   @Column("jsonb")
   changes?: DiscordAuditLogEntryChange<any>[];

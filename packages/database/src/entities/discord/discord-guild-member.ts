@@ -11,7 +11,9 @@ import {
   Column,
   CreateDateColumn,
   DeleteDateColumn,
+  Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -19,6 +21,7 @@ import {
   UpdateDateColumn,
 } from "typeorm";
 
+@Entity("GuildMember", { schema: "discord" })
 export class DiscordGuildMember extends BaseEntity {
   @PrimaryColumn("varchar")
   guildId: string;
@@ -76,6 +79,15 @@ export class DiscordGuildMember extends BaseEntity {
 
   @ManyToMany(() => DiscordRole, role => role.members, {
     cascade: ["remove"],
+  })
+  @JoinTable({
+    schema: "discord",
+    name: "RolesOnGuildMembers",
+    joinColumns: [
+      { name: "userId", referencedColumnName: "userId" },
+      { name: "guildId", referencedColumnName: "guildId" },
+    ],
+    inverseJoinColumns: [{ name: "roleId", referencedColumnName: "id" }],
   })
   roles: DiscordRole[];
 

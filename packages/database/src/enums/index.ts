@@ -1,4 +1,4 @@
-export * from "./discord-audit-log-event";
+export * from "./discord-audit-log-event-type";
 export * from "./discord-channel-flag";
 export * from "./discord-channel-type";
 export * from "./discord-default-message-notification-level";

@@ -6,11 +6,13 @@ import { DiscordStickerFormatType } from "src/enums";
 import {
   BaseEntity,
   Column,
+  Entity,
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
 } from "typeorm";
 
+@Entity("Sticker", { schema: "discord" })
 export class DiscordSticker extends BaseEntity {
   @PrimaryColumn("varchar")
   id: string;

@@ -3,11 +3,13 @@ import {
   BaseEntity,
   Column,
   CreateDateColumn,
+  Entity,
   ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm";
 
+@Entity("Emoji", { schema: "discord" })
 export class DiscordEmoji extends BaseEntity {
   @PrimaryColumn("varchar")
   id: string;

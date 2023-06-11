@@ -7,8 +7,9 @@ import { DiscordUserFlag } from "src/enums/discord-user-flag";
 import { DiscordUserPremiumType } from "src/enums/discord-user-premium-type";
 import { color } from "src/transformers/color";
 import { Flags } from "src/transformers/flag";
-import { BaseEntity, Column, OneToMany, PrimaryColumn } from "typeorm";
+import { BaseEntity, Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 
+@Entity("User", { schema: "discord" })
 export class DiscordUser extends BaseEntity {
   @PrimaryColumn("varchar")
   id: string;

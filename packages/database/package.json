@@ -7,7 +7,10 @@
   "scripts": {
     "build": "tsup",
     "lint": "eslint --ext .ts,.tsx .",
-    "lint:fix": "eslint --fix --ext .ts,.tsx ."
+    "lint:fix": "eslint --fix --ext .ts,.tsx .",
+    "load-env": "dotenv -e ./../../.env.local -e ../../.env",
+    "orm": "pnpm load-env -- ts-node -P . -r @vreiheit/loader/text -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
+    "orm:sync": "pnpm orm schema:sync -d src/data-source.ts"
   },
   "dependencies": {
     "@vreiheit/util": "workspace:^",
@@ -15,12 +18,16 @@
     "typeorm": "^0.3.12"
   },
   "devDependencies": {
+    "@vreiheit/loader": "workspace:^",
     "@vreiheit/eslint-config": "workspace:^",
     "connect-typeorm": "^2.0.0",
     "eslint": "^8.36.0",
     "tslib": "^2.5.0",
     "tsup": "^6.6.3",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.2",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "dotenv-cli": "^7.2.1"
   },
   "publishConfig": {
     "main": "dist/index.js",

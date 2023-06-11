@@ -7,6 +7,7 @@ import { Flags } from "src/transformers/flag";
 import {
   BaseEntity,
   Column,
+  Entity,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -24,6 +25,7 @@ export interface DiscordRoleTags {
   guild_connections?: null;
 }
 
+@Entity("Role", { schema: "discord" })
 export class DiscordRole extends BaseEntity {
   @PrimaryColumn("varchar")
   id: string;
@@ -46,7 +48,7 @@ export class DiscordRole extends BaseEntity {
   @Column("int")
   position: number;
 
-  @Column("int64", { transformer: Flags.transformer(true) })
+  @Column("bigint", { transformer: Flags.transformer(true) })
   permissions: Flags<DiscordPermissionFlag>;
 
   @Column("bool")
@@ -62,7 +64,6 @@ export class DiscordRole extends BaseEntity {
   guild: DiscordGuild;
 
   @ManyToMany(() => DiscordGuildMember, member => member.roles)
-  @JoinTable()
   members: DiscordGuildMember[];
 
   @OneToMany(() => DiscordPermissionOverwrite, overwrite => overwrite.role)

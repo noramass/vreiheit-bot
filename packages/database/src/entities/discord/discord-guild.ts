@@ -18,11 +18,13 @@ import { Flags } from "src/transformers/flag";
 import {
   BaseEntity,
   Column,
+  Entity,
   ManyToOne,
   OneToMany,
   PrimaryColumn,
 } from "typeorm";
 
+@Entity("Guild", { schema: "discord" })
 export class DiscordGuild extends BaseEntity {
   @PrimaryColumn("varchar")
   id: string;

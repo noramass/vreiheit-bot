@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DashboardPage } from "src/components/page/page";
+import { TextTable } from "src/components/table/table";
 
 export default function CmsBlog() {
   const menuEntries = (
@@ -15,7 +16,7 @@ export default function CmsBlog() {
 
   return (
     <DashboardPage menu={menuEntries} menuBottom="hiii">
-      Hello World
+      <TextTable />
     </DashboardPage>
   );
 }

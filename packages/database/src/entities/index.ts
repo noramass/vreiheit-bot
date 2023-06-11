@@ -7,3 +7,4 @@ export * from "./support-ticket";
 export * from "./translation";
 export * from "./user";
 export * from "./session";
+export * from "./discord";

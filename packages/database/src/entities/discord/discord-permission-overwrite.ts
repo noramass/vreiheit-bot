@@ -9,11 +9,13 @@ import { Flags } from "src/transformers/flag";
 import {
   BaseEntity,
   Column,
+  Entity,
   JoinColumn,
   ManyToOne,
   PrimaryColumn,
 } from "typeorm";
 
+@Entity("PermissionOverwrite", { schema: "discord" })
 export class DiscordPermissionOverwrite extends BaseEntity {
   @PrimaryColumn("varchar")
   id: string;

@@ -5,8 +5,9 @@ import { DiscordMessageActivityType } from "src/enums/discord-message-activity-t
 import { DiscordMessageFlag } from "src/enums/discord-message-flag";
 import { DiscordMessageType } from "src/enums/discord-message-type";
 import { Flags } from "src/transformers/flag";
-import { BaseEntity, Column, PrimaryColumn } from "typeorm";
+import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
 
+@Entity("Message", { schema: "discord" })
 export class DiscordMessage extends BaseEntity {
   @PrimaryColumn("varchar")
   id: string;
