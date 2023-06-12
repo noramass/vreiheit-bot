@@ -1,3 +1,4 @@
+export * from "./alt-texts";
 export * from "./i18n";
 export * from "./blocked-terms";
 export * from "./pronouns";
