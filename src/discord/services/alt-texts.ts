@@ -21,6 +21,9 @@ export class AltTexts {
 
   @OnMessageCreate()
   async onMessageCreate(message: Message) {
+    if (message.member.user.bot) return;
+    if (message.channel.isVoiceBased()) return;
+
     const withoutDesc = message.attachments.find(
       x => x.contentType.startsWith("image/") && !x.description,
     );
