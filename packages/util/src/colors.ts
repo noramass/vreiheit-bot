@@ -114,6 +114,24 @@ export function toRgb(color: ColorDefinition): RgbColorArray {
   );
 }
 
+export function toHex(color: ColorDefinition): string {
+  const [r, g, b, a] = toRgb(color).map(hexPad);
+  return `#${r}${g}${b}${a === "ff" ? "" : a}`;
+}
+
+export function toInt(
+  color: ColorDefinition,
+  withAlpha: boolean = false,
+): number {
+  const [r, g, b, a] = toRgb(color);
+  if (withAlpha) return (r << 24) | (g << 16) | (b << 8) | a;
+  else return (r << 16) | (g << 8) | b;
+}
+
+function hexPad(n: number) {
+  return n.toString(16).padStart(2, "0");
+}
+
 function hslColorPart(n: number, a: number, h: number, l: number) {
   const k = (n + h / 30) % 12;
   return clamp(roundTo(255 * (l - a * max(min(k - 3, 9 - k, 1), -1))), 0, 255);

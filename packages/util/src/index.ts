@@ -1,5 +1,5 @@
 export * from "./arrays";
-export * from "./colors";
+export * as Color from "./colors";
 export * from "./diff";
 export * from "./env";
 export * from "./injection";

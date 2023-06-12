@@ -1,6 +1,8 @@
-import * as entities from "src/entities";
-import { env, PromiseOr } from "@vreiheit/util";
-import { TogglePollChoice1680779710292 } from "src/migrations/1680779710292-toggle-poll-choice";
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+/// <reference path="./shims.d.ts" />
+import { env, isDev, PromiseOr } from "@vreiheit/util";
+import * as entities from "./entities";
+import * as migrations from "./migrations";
 import { DataSource, EntityTarget, FindOptionsWhere } from "typeorm";
 
 export const dataSource = new DataSource({
@@ -11,8 +13,10 @@ export const dataSource = new DataSource({
   username: env("postgres_user", "vreiheit"),
   password: env("postgres_password", "vreiheit"),
   synchronize: true,
+  logger: "debug",
+  logging: isDev(),
   entities: Object.values(entities),
-  migrations: [TogglePollChoice1680779710292],
+  migrations: Object.values(migrations),
   subscribers: [],
 });
 
