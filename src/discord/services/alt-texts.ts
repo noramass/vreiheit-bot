@@ -4,6 +4,7 @@ import {
   OnMessageCreate,
   OnMessageDelete,
 } from "src/discord/decorators";
+import { sleep } from "src/util";
 
 const text = `
 **Hey!** Das Bild, das Du gerade eingestellt hast, hat keine Beschreibung. Dies schließt blinde oder sehbehinderte Benutzer\\*innen von der vollen Teilnahme an dieser Gemeinschaft aus.
@@ -33,11 +34,15 @@ export class AltTexts {
     this.replies[message.id] = await message.reply({
       embeds: [new EmbedBuilder().setDescription(text)],
     });
+
+    await sleep(60000);
+    await this.onMessageDelete(message);
   }
 
   @OnMessageDelete()
   async onMessageDelete(message: Message) {
     const reply = this.replies[message.id];
+    delete this.replies[message.id];
     if (reply) await reply.delete();
   }
 }
