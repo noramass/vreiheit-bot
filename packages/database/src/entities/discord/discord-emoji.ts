@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   PrimaryColumn,
   UpdateDateColumn,
@@ -13,6 +14,9 @@ import {
 export class DiscordEmoji extends BaseEntity {
   @PrimaryColumn("varchar")
   id: string;
+
+  @Column("varchar", { nullable: true })
+  guildId?: string;
 
   @Column("varchar")
   name: string;
@@ -33,8 +37,9 @@ export class DiscordEmoji extends BaseEntity {
   updatedAt: Date;
 
   @ManyToOne(() => DiscordGuild, guild => guild.emojis, {
-    nullable: true,
     cascade: ["remove"],
+    nullable: true,
   })
+  @JoinColumn({ name: "guildId", referencedColumnName: "id" })
   guild: DiscordGuild;
 }

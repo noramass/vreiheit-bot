@@ -1,11 +1,23 @@
-import { EnumColumn } from "src/decorators/enum";
-import { DiscordStickerFormatType } from "src/enums";
-import { DiscordInteractionType } from "src/enums/discord-interaction-type";
-import { DiscordMessageActivityType } from "src/enums/discord-message-activity-type";
-import { DiscordMessageFlag } from "src/enums/discord-message-flag";
-import { DiscordMessageType } from "src/enums/discord-message-type";
-import { Flags } from "src/transformers/flag";
-import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
+import { EnumColumn } from "src/decorators";
+import { DiscordChannel } from "src/entities/discord/discord-channel";
+import { DiscordGuild } from "src/entities/discord/discord-guild";
+import { DiscordGuildMember } from "src/entities/discord/discord-guild-member";
+import {
+  DiscordStickerFormatType,
+  DiscordInteractionType,
+  DiscordMessageActivityType,
+  DiscordMessageFlag,
+  DiscordMessageType,
+} from "src/enums";
+import { Flags } from "src/transformers";
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+} from "typeorm";
 
 @Entity("Message", { schema: "discord" })
 export class DiscordMessage extends BaseEntity {
@@ -104,6 +116,24 @@ export class DiscordMessage extends BaseEntity {
 
   @Column("jsonb", { nullable: true })
   roleSubscriptionData?: DiscordRoleSubscriptionData;
+
+  @ManyToOne(() => DiscordGuildMember, member => member.messages)
+  @JoinColumn([
+    { name: "guildId", referencedColumnName: "guildId" },
+    { name: "authorId", referencedColumnName: "userId" },
+  ])
+  author: DiscordGuildMember;
+
+  @ManyToOne(() => DiscordGuild, guild => guild.messages)
+  @JoinColumn({ name: "guildId", referencedColumnName: "id" })
+  guild: DiscordGuild;
+
+  @ManyToOne(() => DiscordChannel, channel => channel.messages)
+  @JoinColumn([
+    { name: "guildId", referencedColumnName: "guildId" },
+    { name: "channelId", referencedColumnName: "id" },
+  ])
+  channel: DiscordChannel;
 }
 
 export interface DiscordRoleSubscriptionData {

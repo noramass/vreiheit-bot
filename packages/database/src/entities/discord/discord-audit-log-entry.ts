@@ -1,11 +1,22 @@
-import { EnumColumn } from "src/decorators/enum";
+import { EnumColumn } from "src/decorators";
+import { DiscordGuild } from "src/entities/discord/discord-guild";
 import { DiscordAuditLogEventType } from "src/enums";
-import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm";
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+} from "typeorm";
 
 @Entity("AuditLogEntry", { schema: "discord" })
 export class DiscordAuditLogEntry extends BaseEntity {
   @PrimaryColumn("varchar")
   id: string;
+
+  @Column("varchar")
+  guildId: string;
 
   @Column("varchar")
   targetId: string;
@@ -24,6 +35,10 @@ export class DiscordAuditLogEntry extends BaseEntity {
 
   @Column("jsonb")
   options?: DiscordAuditLogEntryInfo;
+
+  @ManyToOne(() => DiscordGuild, guild => guild.auditLogEntries)
+  @JoinColumn({ name: "guildId", referencedColumnName: "id" })
+  guild: DiscordGuild;
 }
 
 export interface DiscordAuditLogEntryChange<T> {

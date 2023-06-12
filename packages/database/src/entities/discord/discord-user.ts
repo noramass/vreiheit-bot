@@ -1,12 +1,13 @@
 import { Color } from "@vreiheit/util";
-import { EnumColumn } from "src/decorators/enum";
+import { EnumColumn } from "src/decorators";
 import { DiscordGuild } from "src/entities/discord/discord-guild";
 import { DiscordGuildMember } from "src/entities/discord/discord-guild-member";
-import { DiscordLocale } from "src/enums";
-import { DiscordUserFlag } from "src/enums/discord-user-flag";
-import { DiscordUserPremiumType } from "src/enums/discord-user-premium-type";
-import { color } from "src/transformers/color";
-import { Flags } from "src/transformers/flag";
+import {
+  DiscordLocale,
+  DiscordUserFlag,
+  DiscordUserPremiumType,
+} from "src/enums";
+import { color, Flags } from "src/transformers";
 import { BaseEntity, Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 
 @Entity("User", { schema: "discord" })
@@ -60,7 +61,7 @@ export class DiscordUser extends BaseEntity {
   premiumType: DiscordUserPremiumType;
 
   @Column("int", { transformer: Flags.transformer() })
-  publicFlats: Flags<DiscordUserFlag>;
+  publicFlags: Flags<DiscordUserFlag>;
 
   @OneToMany(() => DiscordGuild, guild => guild.owner)
   ownedGuilds: DiscordGuild[];

@@ -1,4 +1,6 @@
-import { EnumColumn } from "src/decorators/enum";
+import { EnumColumn } from "src/decorators";
+import { DiscordGuild } from "src/entities/discord/discord-guild";
+import { DiscordMessage } from "src/entities/discord/discord-message";
 import { DiscordGuildMember } from "src/entities/discord/discord-guild-member";
 import { DiscordPermissionOverwrite } from "src/entities/discord/discord-permission-overwrite";
 import {
@@ -9,11 +11,12 @@ import {
   DiscordSortOrderType,
   DiscordVideoQualityMode,
 } from "src/enums";
-import { Flags } from "src/transformers/flag";
+import { Flags } from "src/transformers";
 import {
   BaseEntity,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryColumn,
@@ -23,6 +26,15 @@ import {
 export class DiscordChannel extends BaseEntity {
   @PrimaryColumn("varchar")
   id: string;
+
+  @PrimaryColumn("varchar")
+  guildId: string;
+
+  @Column("varchar", { nullable: true })
+  ownerId?: string;
+
+  @Column("varchar", { nullable: true })
+  parentId?: string;
 
   @Column("varchar", { nullable: true })
   name?: string;
@@ -101,15 +113,30 @@ export class DiscordChannel extends BaseEntity {
   @ManyToOne(() => DiscordGuildMember, member => member.ownedChannels, {
     nullable: true,
   })
+  @JoinColumn([
+    { name: "guildId", referencedColumnName: "guildId" },
+    { name: "ownerId", referencedColumnName: "userId" },
+  ])
   owner: DiscordGuildMember;
 
   @ManyToOne(() => DiscordChannel, channel => channel.children, {
     nullable: true,
   })
+  @JoinColumn([
+    { name: "guildId", referencedColumnName: "guildId" },
+    { name: "parentId", referencedColumnName: "id" },
+  ])
   parent?: DiscordChannel;
+
+  @ManyToOne(() => DiscordGuild, guild => guild.channels)
+  @JoinColumn({ name: "guildId", referencedColumnName: "id" })
+  guild: DiscordGuild;
 
   @OneToMany(() => DiscordChannel, channel => channel.parent)
   children: DiscordChannel[];
+
+  @OneToMany(() => DiscordMessage, message => message.channel)
+  messages: DiscordMessage[];
 }
 
 interface DiscordForumTagObject {

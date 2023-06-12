@@ -10,10 +10,15 @@
     "lint:fix": "eslint --fix --ext .ts,.tsx .",
     "load-env": "dotenv -e ./../../.env.local -e ../../.env",
     "orm": "pnpm load-env -- ts-node -P . -r @vreiheit/loader/text -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "orm:sync": "pnpm orm schema:sync -d src/data-source.ts"
+    "orm:sync": "pnpm orm schema:sync -d src/data-source.ts",
+    "orm:migration:generate": "pnpm orm migration:generate src/migrations/schema-changes -d src/data-source.ts --pretty && pnpm index",
+    "orm:migration:run": "pnpm orm migration:run -d src/data-source.ts",
+    "orm:migration:revert": "pnpm orm migration:revert -d src/data-source.ts",
+    "index": "index-ts src"
   },
   "dependencies": {
     "@vreiheit/util": "workspace:^",
+    "@vreiheit/scripts": "workspace:^",
     "pg": "^8.10.0",
     "typeorm": "^0.3.12"
   },

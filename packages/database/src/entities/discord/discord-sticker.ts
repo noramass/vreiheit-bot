@@ -1,7 +1,6 @@
-import { EnumColumn } from "src/decorators/enum";
+import { EnumColumn } from "src/decorators";
 import { DiscordGuild } from "src/entities/discord/discord-guild";
 import { DiscordGuildMember } from "src/entities/discord/discord-guild-member";
-import { DiscordUser } from "src/entities/discord/discord-user";
 import { DiscordStickerFormatType } from "src/enums";
 import {
   BaseEntity,
@@ -39,7 +38,7 @@ export class DiscordSticker extends BaseEntity {
   available: boolean;
 
   @ManyToOne(() => DiscordGuild, guild => guild.stickers)
-  @JoinColumn({ name: "guildId" })
+  @JoinColumn({ name: "guildId", referencedColumnName: "id" })
   guild: DiscordGuild;
 
   @ManyToOne(() => DiscordGuildMember, member => member.uploadedStickers)

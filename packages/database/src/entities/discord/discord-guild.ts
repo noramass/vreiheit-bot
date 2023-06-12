@@ -1,24 +1,30 @@
-import { EnumColumn } from "src/decorators/enum";
+import { EnumColumn } from "src/decorators";
+import { DiscordAuditLogEntry } from "src/entities/discord/discord-audit-log-entry";
+import { DiscordChannel } from "src/entities/discord/discord-channel";
+import { DiscordMessage } from "src/entities/discord/discord-message";
 import { DiscordEmoji } from "src/entities/discord/discord-emoji";
 import { DiscordGuildMember } from "src/entities/discord/discord-guild-member";
 import { DiscordPermissionOverwrite } from "src/entities/discord/discord-permission-overwrite";
 import { DiscordRole } from "src/entities/discord/discord-role";
 import { DiscordSticker } from "src/entities/discord/discord-sticker";
 import { DiscordUser } from "src/entities/discord/discord-user";
-import { DiscordDefaultMessageNotificationLevel } from "src/enums/discord-default-message-notification-level";
-import { DiscordExplicitContentFilterLevel } from "src/enums/discord-explicit-content-filter-level";
-import { DiscordGuildFeature } from "src/enums/discord-guild-feature";
-import { DiscordLocale } from "src/enums/discord-locale";
-import { DiscordMfaLevel } from "src/enums/discord-mfa-level";
-import { DiscordPermissionFlag } from "src/enums/discord-permission-flag";
-import { DiscordGuildPremiumTier } from "src/enums/discord-guild-premium-tier";
-import { DiscordSystemChannelFlag } from "src/enums/discord-system-channel-flag";
-import { DiscordVerificationLevel } from "src/enums/discord-verification-level";
-import { Flags } from "src/transformers/flag";
+import {
+  DiscordDefaultMessageNotificationLevel,
+  DiscordExplicitContentFilterLevel,
+  DiscordGuildFeature,
+  DiscordLocale,
+  DiscordMfaLevel,
+  DiscordPermissionFlag,
+  DiscordGuildPremiumTier,
+  DiscordSystemChannelFlag,
+  DiscordVerificationLevel,
+} from "src/enums";
+import { Flags } from "src/transformers";
 import {
   BaseEntity,
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryColumn,
@@ -31,6 +37,9 @@ export class DiscordGuild extends BaseEntity {
 
   @Column("varchar")
   name: string;
+
+  @Column("varchar")
+  ownerId: string;
 
   @Column("varchar", { nullable: true })
   icon?: string;
@@ -90,6 +99,7 @@ export class DiscordGuild extends BaseEntity {
   roles: DiscordRole[];
 
   @ManyToOne(() => DiscordUser, user => user.ownedGuilds)
+  @JoinColumn({ name: "ownerId", referencedColumnName: "id" })
   owner: DiscordUser;
 
   @OneToMany(() => DiscordGuildMember, member => member.guild)
@@ -100,4 +110,13 @@ export class DiscordGuild extends BaseEntity {
 
   @OneToMany(() => DiscordSticker, sticker => sticker.guild)
   stickers: DiscordSticker[];
+
+  @OneToMany(() => DiscordMessage, message => message.guild)
+  messages: DiscordMessage[];
+
+  @OneToMany(() => DiscordChannel, channel => channel.guild)
+  channels: DiscordChannel[];
+
+  @OneToMany(() => DiscordAuditLogEntry, entry => entry.guild)
+  auditLogEntries: DiscordAuditLogEntry[];
 }

@@ -1,0 +1,7 @@
+{
+  "name": "@vreiheit/scripts",
+  "version": "0.0.0",
+  "bin": {
+    "index-ts": "./index-ts.js"
+  }
+}

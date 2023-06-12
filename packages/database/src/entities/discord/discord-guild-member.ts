@@ -1,11 +1,12 @@
+import { DiscordMessage } from "src/entities/discord/discord-message";
 import { DiscordChannel } from "src/entities/discord/discord-channel";
 import { DiscordGuild } from "src/entities/discord/discord-guild";
 import { DiscordPermissionOverwrite } from "src/entities/discord/discord-permission-overwrite";
 import { DiscordRole } from "src/entities/discord/discord-role";
 import { DiscordSticker } from "src/entities/discord/discord-sticker";
 import { DiscordUser } from "src/entities/discord/discord-user";
-import { DiscordGuildMemberFlag } from "src/enums/discord-guild-member-flag";
-import { Flags } from "src/transformers/flag";
+import { DiscordGuildMemberFlag } from "src/enums";
+import { Flags } from "src/transformers";
 import {
   BaseEntity,
   Column,
@@ -74,7 +75,7 @@ export class DiscordGuildMember extends BaseEntity {
   @ManyToOne(() => DiscordUser, user => user.members, {
     cascade: ["remove", "soft-remove"],
   })
-  @JoinColumn({ name: "userId" })
+  @JoinColumn({ name: "userId", referencedColumnName: "id" })
   user: DiscordUser;
 
   @ManyToMany(() => DiscordRole, role => role.members, {
@@ -99,4 +100,7 @@ export class DiscordGuildMember extends BaseEntity {
 
   @OneToMany(() => DiscordSticker, sticker => sticker.uploadedBy)
   uploadedStickers: DiscordSticker[];
+
+  @OneToMany(() => DiscordMessage, messages => messages.author)
+  messages: DiscordMessage[];
 }

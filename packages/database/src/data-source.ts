@@ -1,8 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="./shims.d.ts" />
-import * as entities from "./entities";
 import { env, isDev, PromiseOr } from "@vreiheit/util";
-import { TogglePollChoice1680779710292 } from "./migrations/1680779710292-toggle-poll-choice";
+import * as entities from "./entities";
+import * as migrations from "./migrations";
 import { DataSource, EntityTarget, FindOptionsWhere } from "typeorm";
 
 export const dataSource = new DataSource({
@@ -16,7 +16,7 @@ export const dataSource = new DataSource({
   logger: "debug",
   logging: isDev(),
   entities: Object.values(entities),
-  migrations: [TogglePollChoice1680779710292],
+  migrations: Object.values(migrations),
   subscribers: [],
 });
 

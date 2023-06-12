@@ -216,6 +216,9 @@ importers:
 
   packages/database:
     dependencies:
+      '@vreiheit/scripts':
+        specifier: workspace:^
+        version: link:../scripts
       '@vreiheit/util':
         specifier: workspace:^
         version: link:../util
@@ -322,6 +325,8 @@ importers:
         version: 0.2.5(prettier@2.8.4)
 
   packages/loader: {}
+
+  packages/scripts: {}
 
   packages/util:
     dependencies:

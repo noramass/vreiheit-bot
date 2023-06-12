@@ -1,14 +1,13 @@
 import { DiscordGuild } from "src/entities/discord/discord-guild";
 import { DiscordGuildMember } from "src/entities/discord/discord-guild-member";
 import { DiscordPermissionOverwrite } from "src/entities/discord/discord-permission-overwrite";
-import { DiscordPermissionFlag } from "src/enums/discord-permission-flag";
-import { color } from "src/transformers/color";
-import { Flags } from "src/transformers/flag";
+import { DiscordPermissionFlag } from "src/enums";
+import { color, Flags } from "src/transformers";
 import {
   BaseEntity,
   Column,
   Entity,
-  JoinTable,
+  JoinColumn,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -33,6 +32,9 @@ export class DiscordRole extends BaseEntity {
   @Column("varchar")
   name: string;
 
+  @Column("varchar")
+  guildId: string;
+
   @Column("int", { transformer: color("int") })
   color: Color.RgbColorArray;
 
@@ -43,12 +45,12 @@ export class DiscordRole extends BaseEntity {
   icon?: string;
 
   @Column("varchar", { nullable: true })
-  uniqueEmoji?: string;
+  unicodeEmoji?: string;
 
   @Column("int")
   position: number;
 
-  @Column("bigint", { transformer: Flags.transformer(true) })
+  @Column("varchar", { transformer: Flags.transformer(true) })
   permissions: Flags<DiscordPermissionFlag>;
 
   @Column("bool")
@@ -61,6 +63,7 @@ export class DiscordRole extends BaseEntity {
   mentionable: boolean;
 
   @ManyToOne(() => DiscordGuild, guild => guild.roles)
+  @JoinColumn({ name: "guildId", referencedColumnName: "id" })
   guild: DiscordGuild;
 
   @ManyToMany(() => DiscordGuildMember, member => member.roles)
