@@ -129,6 +129,10 @@ export class Verification {
   }
 
   async onVerificationRequested(member: GuildMember) {
+    if (this.activeProcess)
+      await this.activeProcess.message.edit({
+        content: `<@${this.activeProcess.user}> hat den channel verlassen.`,
+      });
     const channel = await this.getTextChannel(member.guild);
     const content = await this.message(member, [
       `<@&${this.verificationRoleId}>: ${member} möchte verifiziert werden 🎉`,
