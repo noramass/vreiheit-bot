@@ -115,11 +115,11 @@ export class Verification {
     if (oldState.channelId === newState.channelId) return;
     if (newState.channelId !== this.voiceId) return;
     const { guild, member } = newState;
-    if (this.lastUserId === member.user.id) return await newState.disconnect();
     const roles = member.roles;
     if (roles.cache.has(this.verificationRoleId))
       return this.onVerificationStarted(newState.member);
-    if (roles.cache.has(this.verifiedRoleId)) return;
+    if (this.lastUserId === member.user.id) return;
+    if (roles.cache.has(this.verifiedRoleId)) return newState.disconnect();
     else {
       await sleep(this.gracePeriod);
       const members = await this.getVoiceChannelMembers(guild);
